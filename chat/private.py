@@ -46,7 +46,7 @@ async def chat_request_create(request: Request, payload: ChatCreate):
         return error_response(code=400, message="you don't have permision!")
 
     data = {k: v for k, v in payload.dict().items() if v is not None}
-
+    # create group id
     if data['sender_id'] < data['receiver_id']:
         data['group_id'] = "{sender_id}-{receiver_id}".format(sender_id=data['sender_id'],receiver_id=data['receiver_id'])
     else:
@@ -62,15 +62,15 @@ async def chat_request_pending(request: Request, user_id: int):
     return success_response(await ChatRequest.filter(user_id=user_id, is_activated=None)).order_by('-created_at')
 
 
-
 # chat request true false
 @router.post("/chat/request-confirm", status_code=status.HTTP_200_OK)
-async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequestConfirm):
+async def chat_request_confirm(request: Request, payload: ChatRequestConfirm):
     data = deepcopy(payload.dict())
     # self user check
     if int(data['sender_id']) != int(request.state.user_id):
         return error_response(code=400, message="you don't have permision!")
 
+    # create group id
     if data['sender_id'] < data['receiver_id']:
         data['group_id'] = "{sender_id}-{receiver_id}".format(sender_id=data['sender_id'],receiver_id=data['receiver_id'])
     else:
@@ -83,15 +83,15 @@ async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequ
                 if chat_request_exist:
                     return success_response({"msg":"chat request is accepted! you can't reject"})
                 
-                activate_false_sql = "update tbl_chat_request set is_activated=False where group_id='{group_id}' ".format(group_id=data['group_id'])
+                activate_false_sql = "update tbl_chat_request set is_activated=False where id='{request_id}' ".format(request_id=data['request_id'])
                 await connection.execute_query(activate_false_sql)
                 return success_response({"msg":"chat request rejected"})
 
             activate_true_sql = "update tbl_chat_request set is_activated=True where group_id='{group_id}' ".format(group_id=data['group_id'])
             await connection.execute_query(activate_true_sql)
-            print(activate_true_sql)
 
             chat_request_msg = await ChatRequest.filter(group_id=data['group_id']).order_by('created_at')
+            
             sql = """insert into tbl_chat_msg (group_id,sender_id, receiver_id, is_seen_min, is_seen_max, is_deleted_min, is_deleted_max, msg) values """
 
             sql_values = ""
@@ -102,7 +102,6 @@ async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequ
                 i = i + 1   
                 sql_values = sql_values + "('{group_id}','{sender_id}', '{receiver_id}', '{is_seen_min}', '{is_seen_max}', '{is_deleted_min}', '{is_deleted_max}', '{msg}')".format(group_id=chat_msg.group_id,sender_id=chat_msg.sender_id, receiver_id=chat_msg.receiver_id, is_seen_min='True', is_seen_max='True', is_deleted_min='False', is_deleted_max='False', msg=chat_msg.msg)
             sql = sql + sql_values
-            print(sql)
             await connection.execute_query(sql)
             return success_response({"msg": "data created!"})
     except OperationalError:
@@ -121,7 +120,7 @@ async def chat_create(request: Request, payload: ChatCreate):
         return error_response(code=400, message="you don't have permision!")
 
     data = {k: v for k, v in payload.dict().items() if v is not None}
-
+    # create group id
     if data['sender_id'] < data['receiver_id']:
         data['group_id'] = "{sender_id}-{receiver_id}".format(sender_id=data['sender_id'],receiver_id=data['receiver_id'])
         data['is_seen_min'] = True

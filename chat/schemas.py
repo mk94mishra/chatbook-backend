@@ -13,6 +13,7 @@ class ChatUpdate(BaseModel):
     receiver_id:int
 
 class ChatRequestConfirm(BaseModel):
+    request_id:int
     sender_id:int
     receiver_id:int
     is_activated: bool

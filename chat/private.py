@@ -36,11 +36,6 @@ async def chat_request_check(request: Request, payload: ChatRequestCheck):
         response  = False
     return success_response(response)
 
-# chat request pending list
-@router.get("/chat/request-pending/user/{user_id}", status_code=status.HTTP_200_OK)
-async def chat_request_pending(request: Request, user_id: int):
-    return success_response(await ChatRequest.filter(user_id=user_id, is_activated=None)).order_by('-created_at')
-
 
 # chat request create
 @router.post("/chat/request-create", status_code=status.HTTP_200_OK)
@@ -58,6 +53,14 @@ async def chat_request_create(request: Request, payload: ChatCreate):
         data['group_id'] = "{receiver_id}-{sender_id}".format(receiver_id=data['receiver_id'], sender_id=data['sender_id'])
 
     return success_response(await ChatRequest.create(**data))
+
+    
+
+# chat request pending list
+@router.get("/chat/request-pending/user/{user_id}", status_code=status.HTTP_200_OK)
+async def chat_request_pending(request: Request, user_id: int):
+    return success_response(await ChatRequest.filter(user_id=user_id, is_activated=None)).order_by('-created_at')
+
 
 
 # chat request true false

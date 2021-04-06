@@ -83,7 +83,7 @@ async def chat_request_confirm(request: Request, payload: ChatRequestConfirm):
                 if chat_request_exist:
                     return success_response({"msg":"chat request is accepted! you can't reject"})
                 
-                activate_false_sql = "update tbl_chat_request set is_activated=False where id='{request_id}' ".format(request_id=data['request_id'])
+                activate_false_sql = "update tbl_chat_request set is_activated=False where id='{request_id}' and group_id='{group_id} ".format(request_id=data['request_id'], group_id=data['group_id'])
                 await connection.execute_query(activate_false_sql)
                 return success_response({"msg":"chat request rejected"})
 

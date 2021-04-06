@@ -54,7 +54,7 @@ async def chat_request_create(request: Request, payload: ChatCreate):
 
     return success_response(await ChatRequest.create(**data))
 
-    
+
 
 # chat request pending list
 @router.get("/chat/request-pending/user/{user_id}", status_code=status.HTTP_200_OK)
@@ -64,7 +64,7 @@ async def chat_request_pending(request: Request, user_id: int):
 
 
 # chat request true false
-@router.post("/chat/request-confirm/group/{group_id}", status_code=status.HTTP_200_OK)
+@router.post("/chat/request-confirm", status_code=status.HTTP_200_OK)
 async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequestConfirm):
     data = deepcopy(payload.dict())
     # self user check
@@ -76,26 +76,22 @@ async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequ
     else:
         data['group_id'] = "{receiver_id}-{sender_id}".format(receiver_id=data['receiver_id'], sender_id=data['sender_id'])
 
-    if data['group_id'] != group_id:
-        print(data['group_id'])
-        return error_response(code=400, message="wrong group id!")
-
     try:
         async with in_transaction() as connection:
             if data['is_activated'] == False:
-                chat_request_exist = await ChatRequest.filter(group_id=group_id, is_activated=True).exists()
+                chat_request_exist = await ChatRequest.filter(group_id=data['group_id'], is_activated=True).exists()
                 if chat_request_exist:
                     return success_response({"msg":"chat request is accepted! you can't reject"})
                 
-                activate_false_sql = "update tbl_chat_request set is_activated=False where group_id='{group_id}' ".format(group_id=group_id)
+                activate_false_sql = "update tbl_chat_request set is_activated=False where group_id='{group_id}' ".format(group_id=data['group_id'])
                 await connection.execute_query(activate_false_sql)
                 return success_response({"msg":"chat request rejected"})
 
-            activate_true_sql = "update tbl_chat_request set is_activated=True where group_id='{group_id}' ".format(group_id=group_id)
+            activate_true_sql = "update tbl_chat_request set is_activated=True where group_id='{group_id}' ".format(group_id=data['group_id'])
             await connection.execute_query(activate_true_sql)
             print(activate_true_sql)
 
-            chat_request_msg = await ChatRequest.filter(group_id=group_id).order_by('created_at')
+            chat_request_msg = await ChatRequest.filter(group_id=data['group_id']).order_by('created_at')
             sql = """insert into tbl_chat_msg (group_id,sender_id, receiver_id, is_seen_min, is_seen_max, is_deleted_min, is_deleted_max, msg) values """
 
             sql_values = ""

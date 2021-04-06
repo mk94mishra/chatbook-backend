@@ -16,3 +16,16 @@ class Chat(Model):
 
     class Meta:
         table = "tbl_chat_msg"
+
+
+class ChatRequest(Model):
+    group_id = CharField(max_length=100)
+    sender = ForeignKeyField('models.User', related_name='check_sender_id')
+    receiver = ForeignKeyField('models.User', related_name='check_receiver_id')
+    msg = CharField(max_length=2000)
+    created_at = DatetimeField(auto_now_add=True)
+    is_activated = BooleanField(null=True)
+
+
+    class Meta:
+        table = "tbl_chat_request"

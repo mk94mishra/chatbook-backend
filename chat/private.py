@@ -9,11 +9,79 @@ from tortoise.transactions import in_transaction
 from system.settings import settings
 from common.response import error_response, success_response
 
-from chat.models import Chat
-from chat.schemas import ChatCreate, ChatUpdate
+from chat.models import Chat, ChatRequest
+from chat.schemas import ChatCreate, ChatUpdate, ChatRequestCheck
 
 
 router = APIRouter(prefix='/v1/private', tags=["chat"])
+
+
+# chat request create
+@router.post("/chat/request", status_code=status.HTTP_200_OK)
+async def chat_request_create(request: Request, payload: ChatCreate):
+    data = deepcopy(payload.dict())
+    # self user check
+    if int(data['sender_id']) != int(request.state.user_id):
+        return error_response(code=400, message="you don't have permision!")
+
+    data = {k: v for k, v in payload.dict().items() if v is not None}
+
+    if data['sender_id'] < data['receiver_id']:
+        data['group_id'] = "{sender_id}-{receiver_id}".format(sender_id=data['sender_id'],receiver_id=data['receiver_id'])
+    else:
+        data['group_id'] = "{receiver_id}-{sender_id}".format(receiver_id=data['receiver_id'], sender_id=data['sender_id'])
+
+    return success_response(await ChatRequest.create(**data))
+
+
+# chat request true false
+@router.post("/chat/request/group/{group_id}", status_code=status.HTTP_200_OK)
+async def chat_request_true_false(request: Request, group_id:str, payload: ChatRequestCheck):
+    data = deepcopy(payload.dict())
+    # self user check
+    if int(data['sender_id']) != int(request.state.user_id):
+        return error_response(code=400, message="you don't have permision!")
+
+    if data['sender_id'] < data['receiver_id']:
+        data['group_id'] = "{sender_id}-{receiver_id}".format(sender_id=data['sender_id'],receiver_id=data['receiver_id'])
+    else:
+        data['group_id'] = "{receiver_id}-{sender_id}".format(receiver_id=data['receiver_id'], sender_id=data['sender_id'])
+
+    if data['group_id'] != group_id:
+        print(data['group_id'])
+        return error_response(code=400, message="you don't have permision11!")
+
+    try:
+        async with in_transaction() as connection:
+            if data['is_activated'] == False:
+                chat_request_exist = await ChatRequest.filter(group_id=group_id, is_activated=True).exists()
+                if chat_request_exist:
+                    return success_response({"msg":"chat request is accepted! you can't reject"})
+                
+                activate_false_sql = "update tbl_chat_request set is_activated=False where group_id='{group_id}' ".format(group_id=group_id)
+                await connection.execute_query(activate_false_sql)
+                return success_response({"msg":"chat request rejected"})
+
+            activate_true_sql = "update tbl_chat_request set is_activated=True where group_id='{group_id}' ".format(group_id=group_id)
+            await connection.execute_query(activate_true_sql)
+            print(activate_true_sql)
+
+            chat_request_msg = await ChatRequest.filter(group_id=group_id).order_by('created_at')
+            sql = """insert into tbl_chat_msg (group_id,sender_id, receiver_id, is_seen_min, is_seen_max, is_deleted_min, is_deleted_max, msg) values """
+
+            sql_values = ""
+            i = 1
+            for chat_msg in chat_request_msg:
+                if i > 1:
+                    sql_values = sql_values + ","
+                i = i + 1   
+                sql_values = sql_values + "('{group_id}','{sender_id}', '{receiver_id}', '{is_seen_min}', '{is_seen_max}', '{is_deleted_min}', '{is_deleted_max}', '{msg}')".format(group_id=chat_msg.group_id,sender_id=chat_msg.sender_id, receiver_id=chat_msg.receiver_id, is_seen_min='True', is_seen_max='True', is_deleted_min='False', is_deleted_max='False', msg=chat_msg.msg)
+            sql = sql + sql_values
+            print(sql)
+            await connection.execute_query(sql)
+            return success_response({"msg": "data created!"})
+    except OperationalError:
+        return error_response(code=400, message="something error!")
 
 
 # chat
@@ -32,6 +100,10 @@ async def chat_create(request: Request, payload: ChatCreate):
     else:
         data['group_id'] = "{receiver_id}-{sender_id}".format(receiver_id=data['receiver_id'], sender_id=data['sender_id'])
         data['is_seen_max'] = True
+
+    chat_request_exist = await ChatRequest.filter(group_id=data['group_id'], is_activated=False).exists()
+    if chat_request_exist:
+        return success_response({"msg":"you can't send!"})
 
     return success_response(await Chat.create(**data))
 

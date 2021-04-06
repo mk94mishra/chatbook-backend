@@ -10,10 +10,36 @@ from system.settings import settings
 from common.response import error_response, success_response
 
 from chat.models import Chat, ChatRequest
-from chat.schemas import ChatCreate, ChatUpdate, ChatRequestCheck
+from chat.schemas import ChatCreate, ChatUpdate, ChatRequestConfirm, ChatRequestCheck
 
 
 router = APIRouter(prefix='/v1/private', tags=["chat"])
+
+
+# chat request check
+@router.post("/chat/request-check", status_code=status.HTTP_200_OK)
+async def chat_request_check(request: Request, payload: ChatRequestCheck):
+    data = deepcopy(payload.dict())
+    # self user check
+    if int(data['sender_id']) != int(request.state.user_id):
+        return error_response(code=400, message="you don't have permision!")
+
+    if data['sender_id'] < data['receiver_id']:
+        data['group_id'] = "{sender_id}-{receiver_id}".format(sender_id=data['sender_id'],receiver_id=data['receiver_id'])
+    else:
+        data['group_id'] = "{receiver_id}-{sender_id}".format(receiver_id=data['receiver_id'], sender_id=data['sender_id'])
+    
+    chat_request_exist = await ChatRequest.filter(group_id=data['group_id'], is_activated=True).exists()
+    if chat_request_exist:
+        response  = True
+    else:
+        response  = False
+    return success_response(response)
+
+# chat request pending list
+@router.get("/chat/request-pending/user/{user_id}", status_code=status.HTTP_200_OK)
+async def chat_request_pending(request: Request, user_id: int):
+    return success_response(await ChatRequest.filter(user_id=user_id, is_activated=None)).order_by('-created_at')
 
 
 # chat request create
@@ -36,7 +62,7 @@ async def chat_request_create(request: Request, payload: ChatCreate):
 
 # chat request true false
 @router.post("/chat/request-confirm/group/{group_id}", status_code=status.HTTP_200_OK)
-async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequestCheck):
+async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequestConfirm):
     data = deepcopy(payload.dict())
     # self user check
     if int(data['sender_id']) != int(request.state.user_id):
@@ -49,7 +75,7 @@ async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequ
 
     if data['group_id'] != group_id:
         print(data['group_id'])
-        return error_response(code=400, message="you don't have permision11!")
+        return error_response(code=400, message="wrong group id!")
 
     try:
         async with in_transaction() as connection:

@@ -17,7 +17,7 @@ router = APIRouter(prefix='/v1/private', tags=["chat"])
 
 
 # chat request create
-@router.post("/chat/request", status_code=status.HTTP_200_OK)
+@router.post("/chat/request-create", status_code=status.HTTP_200_OK)
 async def chat_request_create(request: Request, payload: ChatCreate):
     data = deepcopy(payload.dict())
     # self user check
@@ -35,8 +35,8 @@ async def chat_request_create(request: Request, payload: ChatCreate):
 
 
 # chat request true false
-@router.post("/chat/request/group/{group_id}", status_code=status.HTTP_200_OK)
-async def chat_request_true_false(request: Request, group_id:str, payload: ChatRequestCheck):
+@router.post("/chat/request-confirm/group/{group_id}", status_code=status.HTTP_200_OK)
+async def chat_request_confirm(request: Request, group_id:str, payload: ChatRequestCheck):
     data = deepcopy(payload.dict())
     # self user check
     if int(data['sender_id']) != int(request.state.user_id):
@@ -82,6 +82,9 @@ async def chat_request_true_false(request: Request, group_id:str, payload: ChatR
             return success_response({"msg": "data created!"})
     except OperationalError:
         return error_response(code=400, message="something error!")
+
+
+# ------------------------------------------------------------------------------------------
 
 
 # chat

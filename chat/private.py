@@ -67,7 +67,7 @@ async def chat_request_pending(request: Request, user_id: int):
 async def chat_request_confirm(request: Request, payload: ChatRequestConfirm):
     data = deepcopy(payload.dict())
     # self user check
-    if int(data['sender_id']) != int(request.state.user_id):
+    if int(data['receiver_id']) != int(request.state.user_id):
         return error_response(code=400, message="you don't have permision!")
 
     # create group id

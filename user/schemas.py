@@ -23,7 +23,7 @@ class UserUpdate(BaseModel):
     gender: Optional[str] = None
     dob: Optional[str] = None
     profile_pic_url: Optional[HttpUrl] = None
-    user_type_id: Optional[int] = None
+    designation_id: Optional[int] = None
     community_id: Optional[int] = None
     lat: Optional[float] = None
     long: Optional[float] = None

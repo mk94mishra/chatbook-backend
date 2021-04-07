@@ -3,7 +3,7 @@ ALTER TABLE tbl_option
    ADD CONSTRAINT check_types 
    CHECK ("type" IN ('community','category','designation','user_role') )
 
-1. chat group1 tbl as view
+2. chat group1 tbl as view
 
 create view tbl_chat_group1 as ( 
 select distinct on (group_id) group_id, 
@@ -17,7 +17,7 @@ from tbl_chat_msg order by group_id, created_at desc
 )
 
 
-2. chat group with user profile
+3. chat group with user profile
 
 create view tbl_chat_group as ( select 
 cg1.*,
@@ -29,7 +29,7 @@ left join tbl_user as umax on cg1.user_id_max=umax.id
 )
 
 
-3. chat user
+4. chat user
 
 select
 user_id_max as user_id, profile_pic_url_max as profile_pic_url, name_max as "name", last_msg, is_seen_min as is_seen, created_at
@@ -40,23 +40,23 @@ user_id_min as user_id, profile_pic_url_min as profile_pic_url, name_min as "nam
 from tbl_chat_group where user_id_max=5 
 
 
-4. tbl_card_user
+5. tbl_card_user
 
-create view tbl_card_user as (
+create or replace view tbl_card_user as (
 select 
 u.*, 
 c.name as community_name,
-ut.name as user_type_name
+ut.name as designation_name
 from tbl_user as u
-left join tbl_community as c on u.community_id = c.id 
-left join tbl_user_type as ut on u.user_type_id =ut.id
+left join tbl_option as c on u.community_id = c.id 
+left join tbl_option as ut on u.designation_id =ut.id
 where u.is_active=true
 )
 
 
-5. tbl_card_post
+6. tbl_card_post
 
-create view tbl_card_post as (
+create or replace view tbl_card_post as (
 with
 lp as (select post_id, count(id) as count_like from tbl_like_post group by post_id),
 cp as (select post_id, count(id) as count_comment from tbl_comment where is_active=true group by post_id)
@@ -64,20 +64,19 @@ select
 p.*,
 cat.name as category_name,
 com.name as community_name,
-u.name as username,u.profile_pic_url,u.user_type_id, u.lat, u.long,
+u.name as username,u.profile_pic_url,u.designation_id, u.lat, u.long,
 lp.count_like,
 cp.count_comment
 from tbl_post as p
-left join tbl_category as cat on p.category_id = cat.id
-left join tbl_community as com on p.community_id = com.id
+left join tbl_option as cat on p.category_id = cat.id
+left join tbl_option as com on p.community_id = com.id
 left join tbl_user as u on p.user_id = u.id
 left join lp on p.id = lp.post_id
 left join cp on p.id=cp.post_id
 where p.is_active=true
 )
 
-
-6. tbl_card_post_private
+7. tbl_card_post_private
 
 with
 lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id=3),
@@ -90,7 +89,7 @@ lpu.is_like,
 bpu.is_bookmark,
 cpu.is_comment,
 ub.is_block,
-distance as (st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})))
+st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance 
 from tbl_card_post as p
 left join lpu on p.id=lpu.post_id
 left join bpu on p.id=bpu.post_id
@@ -98,7 +97,8 @@ left join cpu on p.id=cpu.post_id
 left join ub on p.user_id=ub.user_id
 where ub.is_block isnull
 
-8. tbl_card_comment
+
+9. tbl_card_comment
 
 create view tbl_card_comment as (
     with
@@ -114,7 +114,7 @@ create view tbl_card_comment as (
 )
 
 
-9. tbl_card_comment private
+10. tbl_card_comment private
 
 select c.* from tbl_card_comment as c left join lateral (select lc.comment_id,lc.user_id,'true' as is_like from tbl_like_comment as lc where lc.user_id=18) as lcu on c.id=lcu.comment_id where c.post_id=76 order by c.created_at desc limit 10 offset 0
 

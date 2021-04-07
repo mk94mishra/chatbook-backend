@@ -11,7 +11,7 @@ class User(AbstractBaseModel):
     dob = CharField(max_length=50, null=True)
     is_phone_verified = BooleanField(default=False)
     is_deleted = BooleanField(default=False)
-    deignation = ForeignKeyField('models.Option',related_name='user_designation', null=True)
+    designation = ForeignKeyField('models.Option',related_name='user_designation', null=True)
     community = ForeignKeyField('models.Option',related_name='user_community', null=True)
     profile_pic_url = CharField(max_length=250, null=True)
     is_deleted = BooleanField(default=False)

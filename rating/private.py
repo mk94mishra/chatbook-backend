@@ -48,6 +48,3 @@ async def rating_create(request: Request, payload: RatingCreate):
     except OperationalError:
         return error_response(code=400, message="something error!")
 
-
-
-

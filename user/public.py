@@ -6,7 +6,6 @@ from time import time
 from tortoise.exceptions import DoesNotExist, OperationalError
 from tortoise.transactions import in_transaction
 
-from system.settings import settings
 from common.token import token_create
 from common.validation import form_validation
 from common.response import error_response, success_response

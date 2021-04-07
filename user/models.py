@@ -17,11 +17,12 @@ class User(AbstractBaseModel):
     is_deleted = BooleanField(default=False)
     inactive_reson = CharField(max_length=500, null=True)
     rating = FloatField(default=0, null=True)
+    lat = FloatField(default=0, null=True) 
+    long = FloatField(default=0, null=True)
     attribute = JSONField(null=True)
 
     class Meta:
         table = "tbl_user"
-
 
 
 class UserBlocked(AbstractBaseModel):

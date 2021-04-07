@@ -111,3 +111,8 @@ create view tbl_card_comment as (
 9. tbl_card_comment private
 
 select c.* from tbl_card_comment as c left join lateral (select lc.comment_id,lc.user_id,'true' as is_like from tbl_like_comment as lc where lc.user_id=18) as lcu on c.id=lcu.comment_id where c.post_id=76 order by c.created_at desc limit 10 offset 0
+
+10. tbl_rating_user
+
+create view tbl_rating_user as (
+select user_id_rated_id , avg(rating) from tbl_rating group by user_id_rated_id)

@@ -42,7 +42,7 @@ async def rating_create(request: Request, payload: RatingCreate):
             WHERE
                 id = {user_id_rated_id}""".format(user_id_rated_id=data['user_id_rated_id'])
 
-            user_rating = await connection.execute_query(sql)
+            await connection.execute_query(sql)
             print(sql)
             return success_response(data)
     except OperationalError:

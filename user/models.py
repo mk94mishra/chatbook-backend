@@ -1,6 +1,6 @@
 from time import time
 from common.base_model import AbstractBaseModel
-from tortoise.fields import CharField, BooleanField, ForeignKeyField, ForeignKeyRelation, JSONField, IntField
+from tortoise.fields import CharField, BooleanField, ForeignKeyField, ForeignKeyRelation, JSONField, IntField, FloatField
 
 
 class User(AbstractBaseModel):
@@ -16,6 +16,7 @@ class User(AbstractBaseModel):
     profile_pic_url = CharField(max_length=250, null=True)
     is_deleted = BooleanField(default=False)
     inactive_reson = CharField(max_length=500, null=True)
+    rating = FloatField(default=0, null=True)
     attribute = JSONField(null=True)
 
     class Meta:

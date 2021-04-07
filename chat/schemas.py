@@ -14,8 +14,8 @@ class ChatUpdate(BaseModel):
 
 class ChatRequestConfirm(BaseModel):
     request_id:int
-    sender_id:int
     receiver_id:int
+    sender_id:int
     is_activated: bool
 
 class ChatRequestCheck(BaseModel):

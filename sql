@@ -45,11 +45,11 @@ from tbl_chat_group where user_id_max=5
 create or replace view tbl_card_user as (
 select 
 u.*, 
-c.name as community_name,
-ut.name as designation_name
+oc.name as community_name,
+od.name as designation_name
 from tbl_user as u
-left join tbl_option as c on u.community_id = c.id 
-left join tbl_option as ut on u.designation_id =ut.id
+left join tbl_option as oc on u.community_id = oc.id 
+left join tbl_option as od on u.designation_id =od.id
 where u.is_active=true
 )
 
@@ -62,14 +62,14 @@ lp as (select post_id, count(id) as count_like from tbl_like_post group by post_
 cp as (select post_id, count(id) as count_comment from tbl_comment where is_active=true group by post_id)
 select 
 p.*,
-cat.name as category_name,
-com.name as community_name,
+ocat.name as category_name,
+ocom.name as community_name,
 u.name as username,u.profile_pic_url,u.designation_id, u.lat, u.long,
 lp.count_like,
 cp.count_comment
 from tbl_post as p
-left join tbl_option as cat on p.category_id = cat.id
-left join tbl_option as com on p.community_id = com.id
+left join tbl_option as ocat on p.category_id = ocat.id
+left join tbl_option as ocom on p.community_id = ocom.id
 left join tbl_user as u on p.user_id = u.id
 left join lp on p.id = lp.post_id
 left join cp on p.id=cp.post_id

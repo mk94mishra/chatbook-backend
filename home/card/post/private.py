@@ -13,8 +13,11 @@ router = APIRouter(prefix='/v1/private', tags=["private-card-post"])
 
 # get card-post all
 @router.get("/card-post", status_code=status.HTTP_200_OK)
-async def card_post_all(request:Request, community_id: Optional[int] = 0,category_id: Optional[int] = 0, user_type_id: Optional[int] = 0, description: Optional[str] = None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
+async def card_post_all(request:Request, community_id: Optional[int] = 0,category_id: Optional[int] = 0, designation_id: Optional[int] = 0, description: Optional[str] = None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
     logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    self_user_lat = user.lat
+    self_user_long = user.long
     try:
         async with in_transaction() as connection:
             sql = """
@@ -28,17 +31,18 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
             lpu.is_like,
             bpu.is_bookmark,
             cpu.is_comment,
-            ub.is_block
+            ub.is_block,
+            st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
             from tbl_card_post as p
             left join lpu on p.id=lpu.post_id
             left join bpu on p.id=bpu.post_id
             left join cpu on p.id=cpu.post_id
             left join ub on p.user_id=ub.user_id
-            """.format(logged_in_user=logged_in_user)
+            """.format(logged_in_user=logged_in_user, self_user_lat=self_user_lat, self_user_long=self_user_long)
 
             where = "where ub.is_block isnull"
             if user_type_id:
-                where = where + " and p.user_type_id={user_type_id}".format(user_type_id=user_type_id)
+                where = where + " and p.designation_id={user_type_id}".format(user_type_id=user_type_id)
             if community_id:
                 where = where + " and p.community_id={community_id}".format(community_id=community_id)
             if category_id:
@@ -65,12 +69,13 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
                     "category_id": card_single['category_id'],
                     "category_name": card_single['category_name'],
+                    "distance":card_single['distance'],
                     "is_like":card_single['is_like'],
                     "is_bookmark":card_single['is_bookmark']
                 }
@@ -86,6 +91,9 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
 @router.get("/card-post/post/{post_id}", status_code=status.HTTP_200_OK)
 async def card_post_single(request:Request, post_id:int):
     logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    self_user_lat = user.lat
+    self_user_long = user.long
     try:
         async with in_transaction() as connection:
             sql = """
@@ -99,13 +107,14 @@ async def card_post_single(request:Request, post_id:int):
             lpu.is_like,
             bpu.is_bookmark,
             cpu.is_comment,
-            ub.is_block
+            ub.is_block,
+            st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
             from tbl_card_post as p
             left join lpu on p.id=lpu.post_id
             left join bpu on p.id=bpu.post_id
             left join cpu on p.id=cpu.post_id
             left join ub on p.user_id=ub.user_id
-            """.format(logged_in_user=logged_in_user)
+            """.format(logged_in_user=logged_in_user, self_user_lat=self_user_lat, self_user_long=self_user_long)
 
             where = "where ub.is_block isnull and p.id={post_id}".format(post_id=post_id)
 
@@ -124,12 +133,13 @@ async def card_post_single(request:Request, post_id:int):
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
                     "category_id": card_single['category_id'],
                     "category_name": card_single['category_name'],
+                    "distance":card_single['distance'],
                     "is_like":card_single['is_like'],
                     "is_bookmark":card_single['is_bookmark']
                 }
@@ -144,6 +154,9 @@ async def card_post_single(request:Request, post_id:int):
 @router.get("/card-post/user/{user_id}", status_code=status.HTTP_200_OK)
 async def card_post_user(request:Request, user_id: int,category_id: Optional[int] = 0, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
     logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    self_user_lat = user.lat
+    self_user_long = user.long
     try:
         async with in_transaction() as connection:
             sql = """
@@ -157,13 +170,14 @@ async def card_post_user(request:Request, user_id: int,category_id: Optional[int
             lpu.is_like,
             bpu.is_bookmark,
             cpu.is_comment,
-            ub.is_block
+            ub.is_block,
+            st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
             from tbl_card_post as p
             left join lpu on p.id=lpu.post_id
             left join bpu on p.id=bpu.post_id
             left join cpu on p.id=cpu.post_id
             left join ub on p.user_id=ub.user_id
-            """.format(logged_in_user=logged_in_user)
+            """.format(logged_in_user=logged_in_user, self_user_lat=self_user_lat, self_user_long=self_user_long)
 
             where = " where p.user_id = {user_id} and ub.is_block isnull".format(user_id=user_id)
 
@@ -188,12 +202,13 @@ async def card_post_user(request:Request, user_id: int,category_id: Optional[int
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
                     "category_id": card_single['category_id'],
                     "category_name": card_single['category_name'],
+                    "distance":card_single['distance'],
                     "is_like":card_single['is_like'],
                     "is_bookmark":card_single['is_bookmark']
                 }
@@ -206,9 +221,11 @@ async def card_post_user(request:Request, user_id: int,category_id: Optional[int
 
 # get card-post all community
 @router.get("/card-post/community/{community_id}", status_code=status.HTTP_200_OK)
-async def card_post_community(request:Request, community_id:int,category_id: Optional[int] = 0, user_type_id: Optional[int] = 0,description: Optional[str] =None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
+async def card_post_community(request:Request, community_id:int,category_id: Optional[int] = 0, designation_id: Optional[int] = 0,description: Optional[str] =None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
+    self_user_lat = user.lat
+    self_user_long = user.long
     # self user community check
     if community_id != user.community_id:
         return error_response(code=401, message="you don't have permission!")
@@ -226,18 +243,19 @@ async def card_post_community(request:Request, community_id:int,category_id: Opt
             lpu.is_like,
             bpu.is_bookmark,
             cpu.is_comment,
-            ub.is_block
+            ub.is_block,
+            st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
             from tbl_card_post as p
             left join lpu on p.id=lpu.post_id
             left join bpu on p.id=bpu.post_id
             left join cpu on p.id=cpu.post_id
             left join ub on p.user_id=ub.user_id
-            """.format(logged_in_user=logged_in_user)
+            """.format(logged_in_user=logged_in_user,self_user_lat=self_user_lat,self_user_long=self_user_long)
 
             where = " where ub.is_block isnull"
 
             if user_type_id:
-                where = where + " and p.user_type_id={user_type_id}".format(user_type_id=user_type_id)
+                where = where + " and p.designation_id={user_type_id}".format(user_type_id=user_type_id)
             if community_id:
                 where = where + " and p.community_id={community_id}".format(community_id=community_id)
             if category_id:
@@ -265,12 +283,13 @@ async def card_post_community(request:Request, community_id:int,category_id: Opt
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
                     "category_id": card_single['category_id'],
                     "category_name": card_single['category_name'],
+                    "distance":card_single['distance'],
                     "is_like":card_single['is_like'],
                     "is_bookmark":card_single['is_bookmark']
                 }
@@ -285,6 +304,9 @@ async def card_post_community(request:Request, community_id:int,category_id: Opt
 @router.get("/card-post/commented", status_code=status.HTTP_200_OK)
 async def card_post_commented(request:Request, limit: Optional[int] = 10, offset: Optional[int] = 0):
     logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    self_user_lat = user.lat
+    self_user_long = user.long
     try:
         async with in_transaction() as connection:
             sql = """
@@ -298,13 +320,14 @@ async def card_post_commented(request:Request, limit: Optional[int] = 10, offset
             lpu.is_like,
             bpu.is_bookmark,
             cpu.is_comment,
-            ub.is_block
+            ub.is_block,
+            st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
             from tbl_card_post as p
             left join lpu on p.id=lpu.post_id
             left join bpu on p.id=bpu.post_id
             left join cpu on p.id=cpu.post_id
             left join ub on p.user_id=ub.user_id
-            """.format(logged_in_user=logged_in_user)
+            """.format(logged_in_user=logged_in_user,self_user_lat=self_user_lat, self_user_long=self_user_long)
 
             where = " where ub.is_block isnull and cpu.is_comment=true"
             
@@ -327,12 +350,13 @@ async def card_post_commented(request:Request, limit: Optional[int] = 10, offset
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
                     "category_id": card_single['category_id'],
                     "category_name": card_single['category_name'],
+                    "distance":card_single['distance'],
                     "is_comment":card_single['is_comment'],
                     "is_like":card_single['is_like'],
                     "is_bookmark":card_single['is_bookmark']
@@ -347,6 +371,9 @@ async def card_post_commented(request:Request, limit: Optional[int] = 10, offset
 @router.get("/card-post/liked", status_code=status.HTTP_200_OK)
 async def card_post_liked(request:Request, limit: Optional[int] = 10, offset: Optional[int] = 0):
     logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    self_user_lat = user.lat
+    self_user_long = user.long
     try:
         async with in_transaction() as connection:
             sql = """
@@ -360,13 +387,14 @@ async def card_post_liked(request:Request, limit: Optional[int] = 10, offset: Op
             lpu.is_like,
             bpu.is_bookmark,
             cpu.is_comment,
-            ub.is_block
+            ub.is_block,
+            st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
             from tbl_card_post as p
             left join lpu on p.id=lpu.post_id
             left join bpu on p.id=bpu.post_id
             left join cpu on p.id=cpu.post_id
             left join ub on p.user_id=ub.user_id
-            """.format(logged_in_user=logged_in_user)
+            """.format(logged_in_user=logged_in_user, self_user_lat=self_user_lat,self_user_long=self_user_long)
 
             where = " where ub.is_block isnull and lpu.is_like=true" 
             
@@ -388,12 +416,13 @@ async def card_post_liked(request:Request, limit: Optional[int] = 10, offset: Op
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
                     "category_id": card_single['category_id'],
                     "category_name": card_single['category_name'],
+                    "distance":card_single['distance'],
                     "is_like":card_single['is_like'],
                     "is_bookmark":card_single['is_bookmark']
                 }
@@ -408,6 +437,9 @@ async def card_post_liked(request:Request, limit: Optional[int] = 10, offset: Op
 async def card_post_bookmarked(request:Request, limit: Optional[int] = 10, offset: Optional[int] = 0):
 
     logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    self_user_lat = user.lat
+    self_user_long = user.long
     try:
         async with in_transaction() as connection:
             sql = """
@@ -421,13 +453,14 @@ async def card_post_bookmarked(request:Request, limit: Optional[int] = 10, offse
             lpu.is_like,
             bpu.is_bookmark,
             cpu.is_comment,
-            ub.is_block
+            ub.is_block,
+            st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
             from tbl_card_post as p
             left join lpu on p.id=lpu.post_id
             left join bpu on p.id=bpu.post_id
             left join cpu on p.id=cpu.post_id
             left join ub on p.user_id=ub.user_id
-            """.format(logged_in_user=logged_in_user)
+            """.format(logged_in_user=logged_in_user,self_user_lat=self_user_lat,self_user_long=self_user_long)
 
             where = " where ub.is_block isnull and bpu.is_bookmark=true"
 
@@ -449,12 +482,13 @@ async def card_post_bookmarked(request:Request, limit: Optional[int] = 10, offse
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
                     "category_id": card_single['category_id'],
                     "category_name": card_single['category_name'],
+                    "distance":card_single['distance'],
                     "is_like":card_single['is_like'],
                     "is_bookmark":card_single['is_bookmark']
                 }

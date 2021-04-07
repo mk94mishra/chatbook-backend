@@ -15,9 +15,6 @@ from common.otp import generate_and_send_otp, verify_generated_otp
 from user.models import User, UserBlocked
 from user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword, UserPhoneOtpVerify, UserPhoneOtpSend,UserDelete, UserBlockedCreate, UserBlockedDelete
 
-from admin.user_type.models import UserType
-from admin.community.models import Community
-
 router = APIRouter(prefix='/v1/private/user', tags=["user"])
 
 

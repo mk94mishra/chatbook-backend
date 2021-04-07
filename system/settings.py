@@ -15,10 +15,7 @@ class Settings:
         'rating.models',
         'chat.models',
         #admin
-        'admin.user_role.models',
-        'admin.category.models',
-        'admin.community.models',
-        'admin.user_type.models',
+        'admin.option.models',
         'admin.orderby.models',
         'admin.faq.models',
         'admin.official.models',

@@ -3,14 +3,9 @@ from user.public import router as user_public_router
 from rating.private import router as rating_private_router
 from chat.private import router as chat_private_router
 
-from admin.user_role.private import router as role_private_router
-from admin.user_role.public import router as role_public_router
-from admin.category.public import router as category_public_router
-from admin.category.private import router as category_private_router
-from admin.community.public import router as community_public_router
-from admin.community.private import router as community_private_router
-from admin.user_type.public import router as user_type_public_router
-from admin.user_type.private import router as user_type_private_router
+from admin.option.private import router as option_private_router
+from admin.option.public import router as option_public_router
+
 from admin.orderby.public import router as orderby_public_router
 from admin.faq.public import router as faq_public_router
 from admin.official.public import router as official_public_router
@@ -39,15 +34,8 @@ app.include_router(rating_private_router)
 app.include_router(chat_private_router)
 
 # include admin
-app.include_router(role_public_router)
-app.include_router(role_private_router)
-app.include_router(category_public_router)
-app.include_router(category_private_router)
-app.include_router(category_public_router)
-app.include_router(community_private_router)
-app.include_router(community_public_router)
-app.include_router(user_type_private_router)
-app.include_router(user_type_public_router)
+app.include_router(option_public_router)
+app.include_router(option_private_router)
 app.include_router(orderby_public_router)
 app.include_router(faq_public_router)
 app.include_router(official_public_router)

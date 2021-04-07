@@ -16,8 +16,6 @@ from common.validation import form_validation
 from user.models import User
 from user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword
 
-from admin.user_type.models import UserType
-from admin.community.models import Community
 
 
 router = APIRouter(prefix='/v1/public/user', tags=["public-user"])

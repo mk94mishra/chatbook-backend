@@ -1,3 +1,8 @@
+1. tbl_option
+ALTER TABLE tbl_option  
+   ADD CONSTRAINT check_types 
+   CHECK ("type" IN ('community','category','designation','user_role') )
+
 1. chat group1 tbl as view
 
 create view tbl_chat_group1 as ( 
@@ -59,7 +64,7 @@ select
 p.*,
 cat.name as category_name,
 com.name as community_name,
-u.name as username,u.profile_pic_url,u.user_type_id,
+u.name as username,u.profile_pic_url,u.user_type_id, u.lat, u.long,
 lp.count_like,
 cp.count_comment
 from tbl_post as p
@@ -84,14 +89,14 @@ p.*,
 lpu.is_like,
 bpu.is_bookmark,
 cpu.is_comment,
-ub.is_block
+ub.is_block,
+distance as (st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})))
 from tbl_card_post as p
 left join lpu on p.id=lpu.post_id
 left join bpu on p.id=bpu.post_id
 left join cpu on p.id=cpu.post_id
 left join ub on p.user_id=ub.user_id
 where ub.is_block isnull
-
 
 8. tbl_card_comment
 
@@ -108,11 +113,8 @@ create view tbl_card_comment as (
     where c.is_active=true
 )
 
+
 9. tbl_card_comment private
 
 select c.* from tbl_card_comment as c left join lateral (select lc.comment_id,lc.user_id,'true' as is_like from tbl_like_comment as lc where lc.user_id=18) as lcu on c.id=lcu.comment_id where c.post_id=76 order by c.created_at desc limit 10 offset 0
 
-10. tbl_rating_user
-
-create view tbl_rating_user as (
-select user_id_rated_id , avg(rating) from tbl_rating group by user_id_rated_id)

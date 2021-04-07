@@ -25,7 +25,7 @@ async def rating_create(request: Request, payload: RatingCreate):
          return error_response(code=400, message="rating between 0 to 10!")
     try:
         data['updated_at'] = datetime.datetime.now()
-        rating = await Rating.get(user_id=data['user_id'], user_id_rated=data['user_id_rated'])
+        rating = await Rating.get(user_id=data['user_id'], user_id_rated=data['user_id_rated_id'])
         await Rating(id=rating.id, **data).save(update_fields=data.keys())
         return success_response(data)
     except:

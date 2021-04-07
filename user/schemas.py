@@ -25,6 +25,8 @@ class UserUpdate(BaseModel):
     profile_pic_url: Optional[HttpUrl] = None
     user_type_id: Optional[int] = None
     community_id: Optional[int] = None
+    lat: Optional[float] = None
+    long: Optional[float] = None
 
 
 class UserDelete(BaseModel):

@@ -35,6 +35,7 @@ async def action_home(request: Request, action_type:str, payload: ActionCreate):
 
     if data['method'] == 'create':
         return success_response(await ActionPost.create(**data))
+        
     if data['method'] == 'delete':
         # -- comment
         if action_type == 'comment':

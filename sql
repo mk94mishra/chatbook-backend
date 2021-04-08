@@ -62,6 +62,7 @@ lp as (select post_id, count(id) as count_like from tbl_like_post group by post_
 cp as (select post_id, count(id) as count_comment from tbl_comment where is_active=true group by post_id)
 select 
 p.*,
+(DATE_PART('day', AGE(CURRENT_TIMESTAMP,p.created_at))) AS ageing,
 ocat.name as category_name,
 ocom.name as community_name,
 u.name as username,u.profile_pic_url,u.designation_id, u.lat, u.long,

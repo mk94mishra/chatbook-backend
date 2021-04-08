@@ -106,7 +106,7 @@ create view tbl_card_comment as (
     select 
     c.*,
     u.name as username, u.profile_pic_url 
-    from tbl_action_post_post as c
+    from tbl_action_post as c
     left join tbl_user as u on c.user_id = u.id
     where c.type='comment'
 )

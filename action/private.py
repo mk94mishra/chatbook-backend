@@ -24,11 +24,9 @@ async def action_home(request: Request, action_type:str, payload: ActionCreate):
     if action_type == 'comment':
         if (not data['description']) & (not data['media_url']):
             return error_response(code=400, message="must be set description or media!")
-
     if action_type == 'spam':
         if not data['description']:
             return error_response(code=400, message="must be fill description!")
-
     if action_type == 'block':
         if not data['user_id_blocked']:
             return error_response(code=400, message="must be fill user_id_blocked!")

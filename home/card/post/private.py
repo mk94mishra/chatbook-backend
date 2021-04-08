@@ -13,7 +13,7 @@ router = APIRouter(prefix='/v1/private', tags=["private-card-post"])
 
 # get card-post all
 @router.get("/card-post", status_code=status.HTTP_200_OK)
-async def card_post_all(request:Request, community_id: Optional[int] = 0,category_id: Optional[int] = 0, designation_id: Optional[int] = 0, description: Optional[str] = None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
+async def card_post_all(request:Request, community_id: Optional[int] = 0,category_id: Optional[int] = 0, designation_id: Optional[int] = 0, description: Optional[str] = None, trending: Optional[bool] = None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     self_user_lat = user.lat
@@ -50,6 +50,9 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
             if description:
                 where = " where ub.is_block isnull and lower(p.description) LIKE '%{description}%'".format(description=description.lower())
             
+            if trending:
+                where = " where ub.is_block isnull and ageing <=1"
+                order_by = 'ageing desc'
             orderby = " order by {order_by} nulls last limit {limit} offset {offset}".format(order_by=order_by, limit=limit,offset=offset)
 
             sql = sql + where + orderby
@@ -221,7 +224,7 @@ async def card_post_user(request:Request, user_id: int,category_id: Optional[int
 
 # get card-post all community
 @router.get("/card-post/community/{community_id}", status_code=status.HTTP_200_OK)
-async def card_post_community(request:Request, community_id:int,category_id: Optional[int] = 0, designation_id: Optional[int] = 0,description: Optional[str] =None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
+async def card_post_community(request:Request, community_id:int,category_id: Optional[int] = 0, designation_id: Optional[int] = 0,description: Optional[str] =None,trending: Optional[int] =None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     self_user_lat = user.lat
@@ -263,7 +266,9 @@ async def card_post_community(request:Request, community_id:int,category_id: Opt
             if description:
                 where = " where ub.is_block isnull and p.community_id={community_id} and lower(p.description) LIKE '%{description}%'".format( community_id=community_id,description=description.lower())
             
-            
+            if trending:
+                where = " where ub.is_block isnull and ageing <=1"
+                order_by = 'ageing desc'
             orderby = " order by {order_by} nulls last limit {limit} offset {offset}".format(order_by=order_by, limit=limit,offset=offset)
 
             sql = sql + where + orderby

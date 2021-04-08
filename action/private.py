@@ -31,12 +31,25 @@ async def action_home(request: Request, action_type:str, payload: ActionCreate):
         if not data['user_id_blocked']:
             return error_response(code=400, message="must be fill user_id_blocked!")
 
-
     data = {k: v for k, v in data.items() if v is not None}
 
     if data['method'] == 'create':
         return success_response(await ActionPost.create(**data))
     if data['method'] == 'delete':
+        # -- comment
+        if action_type == 'comment':
+            if (not data['comment_id']):
+                return error_response(code=400, message="must be set comment_id!")
+
+            await ActionPost.get(id=data['comment_id'],type=data['action_type']).delete()
+            return success_response({"msg":"comment deleted"}) 
+        # -- block
+        if action_type == 'block':
+            if not data['user_id_blocked']:
+                return error_response(code=400, message="must be set user_id_blocked!")
+            await ActionPost.get(user_id=data['user_id'],user_id_blocked=data['user_id_blocked'],type=data['action_type']).delete()
+            return success_response({"msg":"unblocked!"}) 
+
         await ActionPost.get(user_id=data['user_id'], post_id=data['post_id'], type=data['action_type']).delete()
         return success_response({"msg":"action deleted"})
 

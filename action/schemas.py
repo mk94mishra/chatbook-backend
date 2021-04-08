@@ -5,6 +5,7 @@ from pydantic import BaseModel
 class ActionCreate(BaseModel):
     post_id: int
     user_id: int
+    comment_id: Optional[str]= None
     description: Optional[str]= None
     media_url: Optional[str]= None
     user_id_blocked: Optional[int]= None

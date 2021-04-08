@@ -21,14 +21,8 @@ class Settings:
         'admin.official.models',
         # post
         'home.post.models',
-        # comment 
-        'home.comment.models',
-        # like
-        'home.like.models',
-        # bookmark
-        'home.bookmark.models',
-        # spam
-        'home.spam.models'
+        # action
+        'home.action.models'
         ]
 
     SERVICE_NAME = _config.get("SERVICE_NAME", cast=str, default="chatbook-backend")

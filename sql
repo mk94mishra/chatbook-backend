@@ -80,9 +80,9 @@ where p.is_active=true
 7. tbl_card_post_private
 
 with
-lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id=3),
-bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_bookmark as bu where bu.user_id=3),
-cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_comment as c where c.user_id=3 and c.is_active=true group by c.post_id),
+lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id=3),
+bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id=3),
+cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id=3 and c.is_active=true group by c.post_id),
 ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id=3 union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked=3)
 select 
 p.*,
@@ -103,15 +103,12 @@ where ub.is_block isnull
 
 create view tbl_card_comment as (
     with
-    lc as (select lc.comment_id, count(id) as count_like from tbl_like_comment as lc group by lc.comment_id)
     select 
     c.*,
-    lc.count_like,
     u.name as username, u.profile_pic_url 
-    from tbl_comment as c
+    from tbl_action as c
     left join tbl_user as u on c.user_id = u.id
-    left join lc on c.id=lc.comment_id
-    where c.is_active=true
+    where c.type='comment' and c.is_active=true
 )
 
 

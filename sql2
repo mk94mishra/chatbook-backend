@@ -1,0 +1,8 @@
+1. order by
+
+insert into tbl_orderby (type, name_frontend,name_backend)
+values ('home','Latest','p.created_at desc' ),
+      ('home','Oldest','p.created_at' ),
+      ('home','Most Like','count_like desc' ),
+      ('home', 'Most Commented','count_comment desc' ),
+      ('home', 'Trending','p.ageing desc' ),

@@ -11,14 +11,14 @@ router = APIRouter(prefix='/v1/public', tags=["public-card-post"])
 
 # get card all post
 @router.get("/card-post", status_code=status.HTTP_200_OK)
-async def card_post_all(community_id: Optional[int] = 0,category_id: Optional[int] = 0, user_type_id: Optional[int] = 0, description: Optional[str] = None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
+async def card_post_all(community_id: Optional[int] = 0,category_id: Optional[int] = 0, designation_id: Optional[int] = 0, description: Optional[str] = None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'p.created_at desc'):
     try:
         async with in_transaction() as connection:
             sql = """select p.* from tbl_card_post as p"""
             where = " where p.is_active='true' "
 
-            if user_type_id:
-                where = where + " and p.user_type_id={user_type_id}".format(user_type_id=user_type_id)
+            if designation_id:
+                where = where + " and p.designation_id={designation_id}".format(designation_id=designation_id)
             if community_id:
                 where = where + " and p.community_id={community_id}".format(community_id=community_id)
             if category_id:
@@ -44,7 +44,7 @@ async def card_post_all(community_id: Optional[int] = 0,category_id: Optional[in
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
@@ -81,7 +81,7 @@ async def card_post_single(post_id: int):
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],
@@ -122,7 +122,7 @@ async def card_post_user(user_id: int,category_id: Optional[int] = 0, limit: Opt
                     "user_id": card_single['user_id'],
                     "username": card_single['username'],
                     "profile_pic_url": card_single['profile_pic_url'],
-                    "user_type_id": card_single['user_type_id'],
+                    "designation_id": card_single['designation_id'],
                     "count_like": card_single['count_like'],
                     "count_comment": card_single['count_comment'],
                     "community_id": card_single['community_id'],

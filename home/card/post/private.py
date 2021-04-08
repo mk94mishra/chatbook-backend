@@ -22,9 +22,9 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id={logged_in_user}),
-            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_bookmark as bu where bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_comment as c where c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment tbl_action as cpu where cpu.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
             ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
             select 
             p.*,
@@ -41,8 +41,8 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
             """.format(logged_in_user=logged_in_user, self_user_lat=self_user_lat, self_user_long=self_user_long)
 
             where = "where ub.is_block isnull"
-            if user_type_id:
-                where = where + " and p.designation_id={user_type_id}".format(user_type_id=user_type_id)
+            if designation_id:
+                where = where + " and p.designation_id={user_type_id}".format(designation_id=designation_id)
             if community_id:
                 where = where + " and p.community_id={community_id}".format(community_id=community_id)
             if category_id:
@@ -98,9 +98,9 @@ async def card_post_single(request:Request, post_id:int):
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id={logged_in_user}),
-            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_bookmark as bu where bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_comment as c where c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
             ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
             select 
             p.*,
@@ -161,9 +161,9 @@ async def card_post_user(request:Request, user_id: int,category_id: Optional[int
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id={logged_in_user}),
-            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_bookmark as bu where bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_comment as c where c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
             ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
             select 
             p.*,
@@ -234,9 +234,9 @@ async def card_post_community(request:Request, community_id:int,category_id: Opt
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id={logged_in_user}),
-            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_bookmark as bu where bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_comment as c where c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
             ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
             select 
             p.*,
@@ -254,8 +254,8 @@ async def card_post_community(request:Request, community_id:int,category_id: Opt
 
             where = " where ub.is_block isnull"
 
-            if user_type_id:
-                where = where + " and p.designation_id={user_type_id}".format(user_type_id=user_type_id)
+            if designation_id:
+                where = where + " and p.designation_id={user_type_id}".format(designation_id=designation_id)
             if community_id:
                 where = where + " and p.community_id={community_id}".format(community_id=community_id)
             if category_id:
@@ -311,9 +311,9 @@ async def card_post_commented(request:Request, limit: Optional[int] = 10, offset
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id={logged_in_user}),
-            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_bookmark as bu where bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_comment as c where c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
             ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
             select 
             p.*,
@@ -378,9 +378,9 @@ async def card_post_liked(request:Request, limit: Optional[int] = 10, offset: Op
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id={logged_in_user}),
-            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_bookmark as bu where bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_comment as c where c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
             ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
             select 
             p.*,
@@ -444,9 +444,9 @@ async def card_post_bookmarked(request:Request, limit: Optional[int] = 10, offse
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_like_post as lpu where lpu.user_id={logged_in_user}),
-            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_bookmark as bu where bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_comment as c where c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
             ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
             select 
             p.*,

@@ -4,7 +4,7 @@ from tortoise.exceptions import DoesNotExist
 
 from common.response import error_response, success_response
 
-from home.action.models import ActionHome
+from home.action.models import ActionPost
 from home.action.schemas import ActionCreate
 
 router = APIRouter(prefix='/v1/private/action-home', tags=["action-home"])
@@ -33,9 +33,9 @@ async def action_home(request: Request, action_type:str, payload: ActionCreate):
     data = {k: v for k, v in data.items() if v is not None}
 
     if data['method'] == 'create':
-        return success_response(await ActionHome.create(**data))
+        return success_response(await ActionPost.create(**data))
     if data['method'] == 'delete':
-        await ActionHome.get(user_id=data['user_id'], thought_id=data['post_id'], type=data['action_type']).delete()
+        await ActionPost.get(user_id=data['user_id'], post_id=data['post_id'], type=data['action_type']).delete()
         return success_response({"msg":"action deleted"})
 
     return error_response(code=400, message="something error!")

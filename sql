@@ -102,17 +102,11 @@ where ub.is_block isnull
 9. tbl_card_comment
 
 create view tbl_card_comment as (
-    with
     select 
     c.*,
     u.name as username, u.profile_pic_url 
-    from tbl_action as c
+    from tbl_action_home as c
     left join tbl_user as u on c.user_id = u.id
-    where c.type='comment' and c.is_active=true
+    where c.type='comment'
 )
-
-
-10. tbl_card_comment private
-
-select c.* from tbl_card_comment as c left join lateral (select lc.comment_id,lc.user_id,'true' as is_like from tbl_like_comment as lc where lc.user_id=18) as lcu on c.id=lcu.comment_id where c.post_id=76 order by c.created_at desc limit 10 offset 0
 

@@ -13,7 +13,7 @@ class ActionPost(Model):
     created_at = DatetimeField(auto_now_add=True)
 
     class Meta:
-        table = "tbl_action_post"
+        table = "tbl_action"
         unique_together = (("user", "post","type"), )
 
 

@@ -2,6 +2,7 @@ from user.private import router as user_private_router
 from user.public import router as user_public_router
 from rating.private import router as rating_private_router
 from chat.private import router as chat_private_router
+from home.action.private import router as action_private_router
 
 from admin.option.private import router as option_private_router
 from admin.option.public import router as option_public_router
@@ -12,7 +13,6 @@ from admin.official.public import router as official_public_router
 
 # post section import
 from home.post.private import router as post_private_router
-from home.action.private import router as action_private_router
 from home.card.post.public import router as card_post_public_router
 from home.card.post.private import router as card_post_private_router
 from home.card.comment.public import router as card_comment_public_router
@@ -29,6 +29,7 @@ app.include_router(user_private_router)
 app.include_router(user_public_router)
 app.include_router(rating_private_router)
 app.include_router(chat_private_router)
+app.include_router(action_private_router)
 
 # include admin
 app.include_router(option_public_router)
@@ -39,7 +40,6 @@ app.include_router(official_public_router)
 
 # post section
 app.include_router(post_private_router)
-app.include_router(action_private_router)
 app.include_router(card_post_public_router)
 app.include_router(card_post_private_router)
 app.include_router(card_comment_public_router)

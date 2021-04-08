@@ -24,7 +24,7 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
             with
             lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
             bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment tbl_action as cpu where cpu.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
             ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
             select 
             p.*,

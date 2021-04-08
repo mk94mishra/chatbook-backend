@@ -82,7 +82,7 @@ async def user_delete(request: Request, user_id:int, payload: UserDelete):
         await User(id=user_id, **data).save(update_fields=data.keys())
 
         async with in_transaction() as connection:
-            sql = "update tbl_comment set is_active=False, is_deleted=True where user_id={user_id}".format(user_id=user_id)
+            sql = "delete from tbl_option where user_id={user_id} and type='comment'".format(user_id=user_id)
             await connection.execute_query(sql)
             print(sql)
 
@@ -109,13 +109,13 @@ async def user_read(request: Request, user_id:int):
             sql = """select u.id as id, u.name as username, u.phone as phone, 
                 u.profile_pic_url as profile_pic_url,u.gender,u.dob,u.community_id as community_id, u.community_name as community_name ,
                 case when u.password notnull then true else false end as is_password,
-                ut.id as user_type_id, ut.name as user_type_name
+                ud.id as designation_id, ud.name as designation_name
                 from (SELECT u.*,com.name as community_name
                 from tbl_user as u
-                left join tbl_community as com 
+                left join tbl_option as com 
                 on u.community_id = com.id) as u
-                left join tbl_user_type as ut
-                on u.user_type_id=ut.id
+                left join tbl_option as ud
+                on u.designation_id=ud.id
                 """
 
             filter = " where u.is_active = 'true' and u.id={user_id}".format(user_id=user_id)

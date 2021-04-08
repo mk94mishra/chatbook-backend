@@ -25,7 +25,7 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
             lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
             bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
             cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
-            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
+            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id={logged_in_user} and ub1.type='block' union select ub2.user_id as user_id, true as is_block from tbl_action as ub2  where ub2.user_id={logged_in_user} and ub2.type='block')
             select 
             p.*,
             lpu.is_like,
@@ -103,8 +103,8 @@ async def card_post_single(request:Request, post_id:int):
             with
             lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
             bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
-            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
+            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id={logged_in_user} and ub1.type='block' union select ub2.user_id as user_id, true as is_block from tbl_action as ub2  where ub2.user_id={logged_in_user} and ub2.type='block')
             select 
             p.*,
             lpu.is_like,
@@ -166,8 +166,8 @@ async def card_post_user(request:Request, user_id: int,category_id: Optional[int
             with
             lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
             bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
-            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
+            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id={logged_in_user} and ub1.type='block' union select ub2.user_id as user_id, true as is_block from tbl_action as ub2  where ub2.user_id={logged_in_user} and ub2.type='block')
             select 
             p.*,
             lpu.is_like,
@@ -239,8 +239,8 @@ async def card_post_community(request:Request, community_id:int,category_id: Opt
             with
             lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
             bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
-            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
+            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id={logged_in_user} and ub1.type='block' union select ub2.user_id as user_id, true as is_block from tbl_action as ub2  where ub2.user_id={logged_in_user} and ub2.type='block')
             select 
             p.*,
             lpu.is_like,
@@ -316,10 +316,10 @@ async def card_post_commented(request:Request, limit: Optional[int] = 10, offset
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
             bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
-            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
+            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id={logged_in_user} and ub1.type='block' union select ub2.user_id as user_id, true as is_block from tbl_action as ub2  where ub2.user_id={logged_in_user} and ub2.type='block')
             select 
             p.*,
             lpu.is_like,
@@ -383,10 +383,10 @@ async def card_post_liked(request:Request, limit: Optional[int] = 10, offset: Op
         async with in_transaction() as connection:
             sql = """
             with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
+            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
             bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
-            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
+            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id={logged_in_user} and ub1.type='block' union select ub2.user_id as user_id, true as is_block from tbl_action as ub2  where ub2.user_id={logged_in_user} and ub2.type='block')
             select 
             p.*,
             lpu.is_like,
@@ -451,8 +451,8 @@ async def card_post_bookmarked(request:Request, limit: Optional[int] = 10, offse
             with
             lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
             bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} and c.is_active=true group by c.post_id),
-            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id={logged_in_user} union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked={logged_in_user})
+            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
+            ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id={logged_in_user} and ub1.type='block' union select ub2.user_id as user_id, true as is_block from tbl_action as ub2  where ub2.user_id={logged_in_user} and ub2.type='block')
             select 
             p.*,
             lpu.is_like,

@@ -70,7 +70,7 @@ p.*,
 (DATE_PART('day', AGE(CURRENT_TIMESTAMP,p.created_at))) AS ageing,
 ocat.name as category_name,
 ocom.name as community_name,
-u.name as username,u.profile_pic_url,u.designation_id, u.lat, u.long,
+u.name as username,u.gender as gender,u.profile_pic_url,u.designation_id, u.lat, u.long,
 lp.count_like,
 cp.count_comment
 from tbl_post as p
@@ -84,26 +84,24 @@ where p.is_active=true
 
 
 7. tbl_card_post_private
-
 with
-lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id=3),
-bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id=3),
-cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id=3 and c.is_active=true group by c.post_id),
-ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id=3 union select ub2.user_id  as user_id, true as is_block from tbl_action as ub2 where ub2.user_id_blocked=3)
-select 
+lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id=1),   
+bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id=1),            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id=1 group by c.post_id),
+ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id=1 and ub1.type='block' union select ub2.user_id  as user_id, true as is_block from tbl_action as ub2 where ub2.user_id_blocked=1 and ub2.type='block')
+select
 p.*,
 lpu.is_like,
 bpu.is_bookmark,
 cpu.is_comment,
 ub.is_block,
-st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance 
+st_distance(st_makepoint(p.lat,p.long), st_makepoint(-60437559.76521781,75051467.17286935)) as distance
 from tbl_card_post as p
 left join lpu on p.id=lpu.post_id
 left join bpu on p.id=bpu.post_id
 left join cpu on p.id=cpu.post_id
 left join ub on p.user_id=ub.user_id
-where ub.is_block isnull
-
+where ub.is_block isnull and lower(p.description) LIKE '%aute officia%' order by p.created_at desc nulls last limit 10 offset 
+0
 
 9. tbl_card_comment
 

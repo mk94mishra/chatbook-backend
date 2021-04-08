@@ -1,0 +1,13 @@
+insert into tbl_option (name,type,is_verified)
+values ('category1','category',true),
+('category2','category',true),
+('category3','category',true),
+('category4','category',true),
+('community1','community',true),
+('community2','community',true),
+('community3','community',true),
+('community4','community',true),
+('designation1','designation',true),
+('designation2','designation',true),
+('designation3','designation',true),
+('designation4','designation',true)

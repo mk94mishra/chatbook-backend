@@ -53,13 +53,13 @@ left join tbl_option as od on u.designation_id =od.id
 where u.is_active=true
 )
 
-
+  
 6. tbl_card_post
 
 create or replace view tbl_card_post as (
 with
-lp as (select post_id, count(id) as count_like from tbl_like_post group by post_id),
-cp as (select post_id, count(id) as count_comment from tbl_comment where is_active=true group by post_id)
+lp as (select post_id, count(id) as count_like from tbl_action_post where type='like' group by post_id),
+cp as (select post_id, count(id) as count_comment from tbl_action_post where type='comment' group by post_id)
 select 
 p.*,
 (DATE_PART('day', AGE(CURRENT_TIMESTAMP,p.created_at))) AS ageing,
@@ -77,12 +77,13 @@ left join cp on p.id=cp.post_id
 where p.is_active=true
 )
 
+
 7. tbl_card_post_private
 
 with
-lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id=3),
-bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id=3),
-cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id=3 and c.is_active=true group by c.post_id),
+lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action_post as lpu where lpu.type='like' and lpu.user_id=3),
+bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action_post as bu where bu.type='bookmark' and bu.user_id=3),
+cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action_post as c where c.type='comment' and c.user_id=3 and c.is_active=true group by c.post_id),
 ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_user_block as ub1  where ub1.user_id=3 union select ub2.user_id  as user_id, true as is_block from tbl_user_block as ub2 where ub2.user_id_blocked=3)
 select 
 p.*,
@@ -105,7 +106,7 @@ create view tbl_card_comment as (
     select 
     c.*,
     u.name as username, u.profile_pic_url 
-    from tbl_action_home as c
+    from tbl_action_post_post as c
     left join tbl_user as u on c.user_id = u.id
     where c.type='comment'
 )

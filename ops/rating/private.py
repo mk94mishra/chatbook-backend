@@ -6,8 +6,8 @@ from tortoise.transactions import in_transaction
 
 from common.response import error_response, success_response
 
-from rating.models import Rating
-from rating.schemas import RatingCreate
+from ops.rating.models import Rating
+from ops.rating.schemas import RatingCreate
 
 router = APIRouter(prefix='/v1/public/rating', tags=["rating"])
 

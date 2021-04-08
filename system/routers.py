@@ -1,8 +1,8 @@
 from user.private import router as user_private_router
 from user.public import router as user_public_router
-from rating.private import router as rating_private_router
-from chat.private import router as chat_private_router
-from home.action.private import router as action_private_router
+from ops.rating.private import router as rating_private_router
+from ops.chat.private import router as chat_private_router
+from ops.action.private import router as action_private_router
 
 from admin.option.private import router as option_private_router
 from admin.option.public import router as option_public_router

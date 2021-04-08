@@ -9,8 +9,8 @@ from tortoise.transactions import in_transaction
 from system.settings import settings
 from common.response import error_response, success_response
 
-from chat.models import Chat, ChatRequest
-from chat.schemas import ChatCreate, ChatUpdate, ChatRequestConfirm, ChatRequestCheck
+from ops.chat.models import Chat, ChatRequest
+from ops.chat.schemas import ChatCreate, ChatUpdate, ChatRequestConfirm, ChatRequestCheck
 
 
 router = APIRouter(prefix='/v1/private', tags=["chat"])

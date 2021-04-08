@@ -51,7 +51,7 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
                 where = " where ub.is_block isnull and lower(p.description) LIKE '%{description}%'".format(description=description.lower())
             
             if trending:
-                where = " where ub.is_block isnull and ageing <=1"
+                where = " where ub.is_block isnull and p.ageing <=1"
                 order_by = 'ageing desc'
             orderby = " order by {order_by} nulls last limit {limit} offset {offset}".format(order_by=order_by, limit=limit,offset=offset)
 
@@ -267,7 +267,7 @@ async def card_post_community(request:Request, community_id:int,category_id: Opt
                 where = " where ub.is_block isnull and p.community_id={community_id} and lower(p.description) LIKE '%{description}%'".format( community_id=community_id,description=description.lower())
             
             if trending:
-                where = " where ub.is_block isnull and ageing <=1"
+                where = " where p.community_id={community_id} and ub.is_block isnull and p.ageing <=1".format(community_id=community_id)
                 order_by = 'ageing desc'
             orderby = " order by {order_by} nulls last limit {limit} offset {offset}".format(order_by=order_by, limit=limit,offset=offset)
 

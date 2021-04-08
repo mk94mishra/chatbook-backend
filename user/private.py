@@ -13,7 +13,7 @@ from common.response import error_response, success_response
 from common.otp import generate_and_send_otp, verify_generated_otp
 
 from user.models import User, UserBlocked
-from user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword, UserPhoneOtpVerify, UserPhoneOtpSend,UserDelete, UserBlockedCreate, UserBlockedDelete
+from user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword, UserPhoneOtpVerify, UserPhoneOtpSend,UserDelete
 
 router = APIRouter(prefix='/v1/private/user', tags=["user"])
 
@@ -173,68 +173,5 @@ async def user_phone_otp_verify(request: Request, payload: UserPhoneOtpVerify):
             
         return success_response({"msg":"phone number updated!"})
     return  error_response(code=400, message="invalide otp!")
-
-
-# create blocked
-@router.post("/block-create", status_code=status.HTTP_201_CREATED)
-async def user_block_create(request: Request, payload: UserBlockedCreate):
-    data = deepcopy(payload.dict())
-
-    # self user check
-    if int(data['user_id']) != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
-
-    if int(data['user_id']) == int(data['user_id_blocked']):
-        return error_response(code=400, message="you don't have permision!")
-
-    data = {k: v for k, v in payload.dict().items() if v is not None}
-
-    data['created_by'] = request.state.user_id
-    data['updated_by'] = request.state.user_id
-    
-    return success_response(await UserBlocked.create(**data))
-
-# delete block 
-@router.post("/block-delete", status_code=status.HTTP_201_CREATED)
-async def user_block_delete(request: Request, payload:UserBlockedDelete):
-    data = deepcopy(payload.dict())
-    # self user check
-    if int(data['user_id']) != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
-
-    data = {k: v for k, v in payload.dict().items() if v is not None}
-
-    try:
-        user = await UserBlocked.get(user_id=data['user_id'], user_id_blocked=data['user_id_blocked']).delete()
-        print(user)
-        return success_response({"msg":"unblocked"})
-    except:
-        return error_response(code=400, message="something error!")
-
-
-# get block 
-@router.get("/{user_id}/block-list", status_code=status.HTTP_200_OK)
-async def user_block_list(request: Request, user_id:int, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'b.created_at desc'):
-    # self user check
-    if int(user_id) != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
-
-    try:
-        async with in_transaction() as connection:
-            sql = """select b.user_id_blocked,
-            u.name as username, u.profile_pic_url , b.created_at
-            from tbl_user_block as b
-            left join tbl_user as u on b.user_id_blocked = u.id"""
-
-            where = " where b.user_id = {user_id}".format(user_id=user_id)
-            
-            orderby = " order by {order_by} limit {limit} offset {offset}".format(order_by=order_by, limit=limit,offset=offset)
-
-            sql = sql + where + orderby
-            blocked_user = await connection.execute_query(sql)
-            
-            return success_response(blocked_user[1])
-    except OperationalError:
-        return error_response(code=400, message="something error!")
     
 

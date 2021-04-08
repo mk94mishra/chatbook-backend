@@ -24,14 +24,3 @@ class User(AbstractBaseModel):
     class Meta:
         table = "tbl_user"
 
-
-class UserBlocked(AbstractBaseModel):
-    user_id = IntField()
-    user_id_blocked = IntField()
-
-    class Meta:
-        table = "tbl_user_block"
-        unique_together = (("user_id","user_id_blocked"), )
-
-
-        

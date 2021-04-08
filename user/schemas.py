@@ -43,14 +43,5 @@ class UserPhoneOtpVerify(BaseModel):
     phone: str
     otp: str
 
-class UserBlockedCreate(BaseModel):
-    user_id: int
-    user_id_blocked: int
-
-class UserBlockedDelete(BaseModel):
-    user_id: int
-    user_id_blocked: int
-
-
 
 

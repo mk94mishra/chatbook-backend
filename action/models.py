@@ -11,7 +11,7 @@ class ActionPost(Model):
     description = CharField(max_length=500, null=True)
     media_url = CharField(max_length=500, null=True)
 
-    user_id_blocked = IntField()
+    user_id_blocked = IntField(null=True)
 
     created_at = DatetimeField(auto_now_add=True)
 

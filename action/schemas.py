@@ -7,6 +7,7 @@ class ActionCreate(BaseModel):
     user_id: int
     description: Optional[str]= None
     media_url: Optional[str]= None
+    user_id_blocked: Optional[int]= None
     method: str
 
 

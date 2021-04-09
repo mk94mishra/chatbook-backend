@@ -114,7 +114,7 @@ async def user_delete(request: Request, user_id:int, payload: UserDelete):
         await User(id=user_id, **data).save(update_fields=data.keys())
 
         async with in_transaction() as connection:
-            sql = "delete from tbl_option where user_id={user_id} and type='comment'".format(user_id=user_id)
+            sql = "update tbl_action set is_active=False where user_id={user_id}".format(user_id=user_id)
             await connection.execute_query(sql)
             print(sql)
 

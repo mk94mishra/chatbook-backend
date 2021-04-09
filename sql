@@ -87,7 +87,7 @@ where p.is_active=true
 with
 lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id=1),   
 bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id=1),            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id=1 group by c.post_id),
-ub as (select ub1.user_id_blocked  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id=1 and ub1.type='block' union select ub2.user_id  as user_id, true as is_block from tbl_action as ub2 where ub2.user_id_blocked=1 and ub2.type='block')
+ub as (select ub1.user_id_blocked_id  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id=1 and ub1.type='block' union select ub2.user_id  as user_id, true as is_block from tbl_action as ub2 where ub2.user_id_blocked_id=1 and ub2.type='block')
 select
 p.*,
 lpu.is_like,

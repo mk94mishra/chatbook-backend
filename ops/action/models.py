@@ -1,5 +1,5 @@
 from tortoise.models import Model
-from tortoise.fields import ForeignKeyField, CharField, DatetimeField,IntField
+from tortoise.fields import ForeignKeyField, CharField, DatetimeField,IntField, FloatField, BooleanField
 
 
 class ActionPost(Model):
@@ -11,13 +11,18 @@ class ActionPost(Model):
     description = CharField(max_length=500, null=True)
     media_url = CharField(max_length=500, null=True)
 
-    user_id_blocked = IntField(null=True)
+    user_id_blocked = ForeignKeyField('models.User', related_name='blocked_user', null=True)
+    user_id_rated = ForeignKeyField('models.User', related_name='rating_receiver', null=True)
+
+    rating = FloatField(default=0, null=True)
 
     created_at = DatetimeField(auto_now_add=True)
 
+    is_active = BooleanField(default=True, null=True)
+
     class Meta:
         table = "tbl_action"
-        unique_together = (("user", "post","type"),("user","user_id_blocked") )
+        unique_together = (("user", "post","type"),("user","user_id_blocked"),("user","user_id_rated") )
 
 
       

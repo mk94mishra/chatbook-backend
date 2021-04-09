@@ -5,6 +5,6 @@ from pydantic import BaseModel, HttpUrl
 class OptionCreate(BaseModel):
     name: str
     type: str 
-    icon_url1: Optional[HttpUrl] = None
-    icon_url2: Optional[HttpUrl] = None
+    icon_url_1: Optional[HttpUrl] = None
+    icon_url_2: Optional[HttpUrl] = None
 

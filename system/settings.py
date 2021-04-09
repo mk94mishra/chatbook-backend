@@ -12,7 +12,6 @@ class Settings:
     # register models
     models_path = [
         'user.models',
-        'ops.rating.models',
         'ops.chat.models',
         'ops.action.models',
         #admin

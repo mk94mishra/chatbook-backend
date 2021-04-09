@@ -8,7 +8,9 @@ class ActionCreate(BaseModel):
     comment_id: Optional[str]= None
     description: Optional[str]= None
     media_url: Optional[str]= None
-    user_id_blocked: Optional[int]= None
+    user_id_blocked_id: Optional[int]= None
+    user_id_rated_id: Optional[int]= None
+    rating: Optional[float]= None
     method: str
 
 

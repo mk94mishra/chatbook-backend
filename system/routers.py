@@ -1,6 +1,5 @@
 from user.private import router as user_private_router
 from user.public import router as user_public_router
-from ops.rating.private import router as rating_private_router
 from ops.chat.private import router as chat_private_router
 from ops.action.private import router as action_private_router
 
@@ -27,7 +26,6 @@ app = FastAPI(openapi_url = "/openapi.json", title = "chatbook backend", version
 # include routers
 app.include_router(user_private_router)
 app.include_router(user_public_router)
-app.include_router(rating_private_router)
 app.include_router(chat_private_router)
 app.include_router(action_private_router)
 

@@ -26,8 +26,8 @@ from tbl_chat_msg order by group_id, created_at desc
 
 create view tbl_chat_group as ( select 
 cg1.*,
- umin.name as name_min, umin.profile_pic_url as profile_pic_url_min,
- umax.name as name_max, umax.profile_pic_url as profile_pic_url_max
+ umin.username as name_min, umin.profile_pic_url as profile_pic_url_min,
+ umax.username as name_max, umax.profile_pic_url as profile_pic_url_max
 from tbl_chat_group1 as cg1
 left join tbl_user as umin on cg1.user_id_min=umin.id
 left join tbl_user as umax on cg1.user_id_max=umax.id
@@ -70,7 +70,7 @@ p.*,
 (DATE_PART('day', AGE(CURRENT_TIMESTAMP,p.created_at))) AS ageing,
 ocat.name as category_name,
 ocom.name as community_name,
-u.name as username,u.gender as gender,u.profile_pic_url,u.designation_id, u.lat, u.long,
+u.username as username,u.gender as gender,u.profile_pic_url,u.designation_id, u.lat, u.long,
 lp.count_like,
 cp.count_comment
 from tbl_post as p
@@ -108,7 +108,7 @@ where ub.is_block isnull and lower(p.description) LIKE '%aute officia%' order by
 create view tbl_card_comment as (
     select 
     c.*,
-    u.name as username, u.profile_pic_url 
+    u.username as username, u.profile_pic_url 
     from tbl_action as c
     left join tbl_user as u on c.user_id = u.id
     where c.type='comment'

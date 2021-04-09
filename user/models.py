@@ -4,7 +4,7 @@ from tortoise.fields import CharField, BooleanField, ForeignKeyField, ForeignKey
 
 
 class User(AbstractBaseModel):
-    name = CharField(max_length=100, null=True)
+    username = CharField(max_length=100, null=True)
     phone = CharField(max_length=100, unique=True)
     password = CharField(max_length=100, null=True)
     gender = CharField(max_length=15, null=True)

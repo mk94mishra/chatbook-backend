@@ -18,7 +18,7 @@ class UserLoginPassword(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    name: Optional[str] = None
+    username: Optional[str] = None
     password: Optional[str] = None
     gender: Optional[str] = None
     dob: Optional[str] = None

@@ -66,7 +66,7 @@ async def user_read(request: Request, user_id:int):
 
     try:
         async with in_transaction() as connection:
-            sql = """select u.id as id, u.name as username, u.phone as phone, 
+            sql = """select u.id as id, u.username as username, u.phone as phone, 
                 u.profile_pic_url as profile_pic_url,u.gender,u.dob,u.community_id as community_id, u.community_name as community_name ,
                 case when u.password notnull then true else false end as is_password,
                 ud.id as designation_id, ud.name as designation_name

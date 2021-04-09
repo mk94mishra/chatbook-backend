@@ -59,6 +59,22 @@ async def chat_request_create(request: Request, payload: ChatCreate):
 # chat request pending list
 @router.get("/chat/request-pending/user/{user_id}", status_code=status.HTTP_200_OK)
 async def chat_request_pending(request: Request, user_id: int):
+    try:
+        async with in_transaction() as connection:
+            sql = """
+            select 
+            c.* ,
+            u.username as username, u.profile_pic_url, u.rating
+            from tbl_chat_request as c
+            left join tbl_user as u on c.receiver_id=c.id
+            where c.receiver_id = {user_id}
+            """.format(user_id=user_id)
+            
+            await connection.execute_query(sql)
+            return success_response({"msg": "data created!"})
+    except OperationalError:
+        return error_response(code=400, message="something error!")
+
     return success_response(await ChatRequest.filter(user_id=user_id, is_activated=None)).order_by('-created_at')
 
 

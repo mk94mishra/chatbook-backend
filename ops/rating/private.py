@@ -9,7 +9,7 @@ from common.response import error_response, success_response
 from ops.rating.models import Rating
 from ops.rating.schemas import RatingCreate
 
-router = APIRouter(prefix='/v1/public/rating', tags=["rating"])
+router = APIRouter(prefix='/v1/private/rating', tags=["rating"])
 
 
 # rating create
@@ -17,8 +17,8 @@ router = APIRouter(prefix='/v1/public/rating', tags=["rating"])
 async def rating_create(request: Request, payload: RatingCreate):
     data = deepcopy(payload.dict())
     # self user check
-    """if int(data['user_id']) != int(request.state.user_id):
-        return error_response(code=401, message="you don't have permission!")"""
+    if int(data['user_id']) != int(request.state.user_id):
+        return error_response(code=401, message="you don't have permission!")
     
     data = {k: v for k, v in payload.dict().items() if v is not None}
     if (data['rating'] < 0) or  (data['rating'] > 10):

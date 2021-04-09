@@ -14,7 +14,7 @@ router = APIRouter(prefix='/v1/private/action', tags=["action"])
 
 # create/delete action
 @router.post("/type/{action_type}", status_code=status.HTTP_201_CREATED)
-async def action_home(request: Request, action_type:str, payload: ActionCreate):
+async def action_post(request: Request, action_type:str, payload: ActionCreate):
     data = deepcopy(payload.dict())
 
     # self user check
@@ -61,7 +61,7 @@ async def action_home(request: Request, action_type:str, payload: ActionCreate):
 
 
 # get block 
-@router.get("/type/{action_type}", status_code=status.HTTP_200_OK)
+@router.get("/type/{action_type}/block-list", status_code=status.HTTP_200_OK)
 async def user_block_list(request: Request, action_type:str, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'b.created_at desc'):
     # self user check
     user_id = int(request.state.user_id)

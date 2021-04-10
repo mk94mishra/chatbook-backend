@@ -50,22 +50,8 @@ left join asp on p.id=asp.post_id
 left join ab1 on p.user_id=ab1.user_id_blocked_id
 left join ab2 on p.user_id=ab2.user_id
 
-
-3. tbl_card_user
-
-create or replace view tbl_card_user as (
-select 
-u.*, 
-oc.name as community_name,
-od.name as designation_name
-from tbl_user as u
-left join tbl_option as oc on u.community_id = oc.id 
-left join tbl_option as od on u.designation_id =od.id
-where u.is_active=true
-)
-
   
-4. tbl_card_comment
+3. tbl_card_comment
 
 create view tbl_card_comment as (
     select 

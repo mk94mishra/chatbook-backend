@@ -72,7 +72,7 @@ async def user_otp_verify(request: Request, payload: UserOtpVerify):
                 'sub': user.id
             }
             # check community & user type
-            if (not user.community_id) or (not user.user_type_id):
+            if (not user.community_id) or (not user.designation_id) or (not user.gender):
                 return success_response({"token": token_create(claims),"user_id": user.id, "next": "update-profile"})
             # create token and send user to update profile
             return success_response({"token": token_create(claims),"user_id": user.id, "next": "home"})
@@ -105,7 +105,7 @@ async def user_login_password(request: Request, payload: UserLoginPassword):
             'sub': user.id
         }
         # check community & user type
-        if (not user.community_id) or (not user.user_type_id):
+        if (not user.community_id) or (not user.designation_id) or (not user.gender):
             return success_response({"token": token_create(claims),"user_id": user.id, "next": "update-profile"})
         return success_response({"token": token_create(claims), "user_id": user.id, "next": "home"})
 

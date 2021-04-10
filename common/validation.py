@@ -1,6 +1,43 @@
 import re 
 import datetime
 	
+def media_validation(**media) -> (bool, str):
+    if (not media['url']) & (not media['type']) (not media['thumbnail_url']):
+        return True, None
+
+    if media['url']:
+        if not media['type']:
+            return False, {"msg": "must be set media type!"}
+    
+    if (media['type'] == 'image') or (media['type'] == 'video') or (media['type'] == 'pdf'):
+        # check length
+        if media['type'] == 'image':
+            if len(media['url']) > 5:
+                return False, {"msg": "maximum 5 image you can upload!"}
+            if media['thumbnail_url']:
+                return False, {"msg": "image don't need thumbnail url!"}
+        
+        if media['type'] == 'video':
+            if len(media['url']) > 1:
+                return False, {"msg": "maximum 1 video you can upload!"}
+            if len(media['url']) !=  len(media['thumbnail_url']):
+                return False, {"msg": "video & thumbnail url length not match!"}
+        
+        if media['type'] == 'pdf':
+            if len(media['url']) > 1:
+                return False, {"msg": "maximum 1 pdf you can upload!"}
+            if media['thumbnail_url']:
+                return False, {"msg": "pdf don't need thumbnail url!"}
+
+        # check url
+        for m_url in media['url']:
+            validation_url(m_url)
+        for mt_url in media['thumbnail_url']:
+            validation_url(mt_url)
+                
+        return True, None
+    else:
+        return False, {"msg": "wrong media type! media type options are 'image','video','pdf' "}
 
 def form_validation(validation_name, validation_data):
     if validation_data == None:

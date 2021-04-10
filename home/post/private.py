@@ -5,7 +5,7 @@ from tortoise.exceptions import DoesNotExist, OperationalError
 from tortoise.transactions import in_transaction
 from system.settings import settings
 
-from common.validation import form_validation
+from common.validation import form_validation, media_validation
 from common.response import error_response, success_response
 
 from home.post.models import Post
@@ -38,104 +38,17 @@ async def post_create(request: Request, payload: PostCreate):
     if (not data['description']) & (not data['media_url']):
         return error_response(code=400, message="data is empty!")
 
-    if not data['media_url']:
-        data['media_type'] = None
-        data['thumbnail_url'] = None
+    data['media'] = {
+        'type': data['media_type'],
+        'url': data['media_url'],
+        'thumbnail_url': data['thumbnail_url']
+    }
+    ok, err = media_validation(data['media'])
+    if err:
+        return error_response(code=400, message=err)
 
-    if data['media_url']:
-        if (not data['media_type']):
-            return error_response(code=400, message="must be set media type!")
-
-    if data['media_type'] == 'video':
-        if len(data['thumbnail_url']) != len(data['media_url']):
-            return error_response(code=400, message="must be set thumbnail!")
-        if len(data['media_url']) > 1:
-            return error_response(code=400, message="maximum one video upload!")
-
-    if data['media_type'] == 'image':
-        data['thumbnail_url'] = None
-        if len(data['media_url']) > 5:
-            return error_response(code=400, message="maximum five image upload!")
-
-    if data['media_type'] == 'pdf':
-        if len(data['media_url']) > 1:
-            return error_response(code=400, message="maximum one pdf upload!")
-
-    if data['media_type'] == 'image' or data['media_type'] == 'video' or data['media_type'] == 'pdf' or  data['media_type'] == None:
-
-        if data['media_type']:
-            for m_url in data['media_url']:
-                ok, err = form_validation('url', m_url)
-                if err:
-                    return error_response(code=400, message=err)
-            
-            if data['media_type'] == 'video':
-                for t_url in data['thumbnail_url']:
-                    ok, err = form_validation('url', t_url)
-                    if err:
-                        return error_response(code=400, message=err)
-
-            data['media'] = {
-                'type': data['media_type'],
-                'url': data['media_url'],
-                'thumbnail_url': data['thumbnail_url']
-            }
-        data = {k: v for k, v in data.items() if v is not None}
-        return success_response(await Post.create(**data))
-
-    return error_response(code=400, message="something error!")
-
-
-# update post 
-@router.put("/{post_id}", status_code=status.HTTP_201_CREATED)
-async def post_update(request: Request, post_id: int, payload: PostUpdate):
-    data = deepcopy(payload.dict())
-    post = await Post.get(id=post_id)
-
-    # self user check
-    if post.user_id != request.state.user_id:
-        error_response(code=401, message="you don't have permission!")
-
-    data['updated_by'] = request.state.user_id
-    
-    # media update
-    if len(data['media_url']):
-        if not data['media_type']:
-            return error_response(code=400, message="must be set media type!")
-
-    if data['media_type'] == 'video':
-        if len(data['thumbnail_url']) != len(data['media_url']):
-            return error_response(code=400, message="must be set thumbnail!")
-        if len(data['media_url']) > 1:
-            return error_response(code=400, message="maximum one video upload!")
-    
-    if data['media_type'] == 'image':
-        data['thumbnail_url'] = None
-        if len(data['media_url']) > 5:
-            return error_response(code=400, message="maximum five image upload!")
-    
-    if data['media_type'] == 'pdf':
-        if len(data['media_url']) > 1:
-            return error_response(code=400, message="maximum one pdf upload!")
-    
-    if data['media_type'] == 'image' or data['media_type'] == 'video' or data['media_type'] == 'pdf' or  data['media_type'] == None:
-
-        data['media'] = None
-        if data['media_type']:
-            data['media'] = {
-                'type': data['media_type'],
-                'url': data['media_url'],
-                'thumbnail_url': data['thumbnail_url']
-            }
-
-        post_data = {
-            "description": data["description"],
-            "media": data['media']
-        }
-    
-        # post update 
-        await Post(id=post_id, **post_data).save(update_fields=post_data.keys())
-        return success_response({"msg":"data updated!"})
+    data = {k: v for k, v in data.items() if v is not None}
+    return success_response(await Post.create(**data))
 
 
 # delete post 

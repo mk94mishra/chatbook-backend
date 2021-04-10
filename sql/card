@@ -51,14 +51,4 @@ left join ab1 on p.user_id=ab1.user_id_blocked_id
 left join ab2 on p.user_id=ab2.user_id
 
   
-3. tbl_card_comment
-
-create view tbl_card_comment as (
-    select 
-    c.*,
-    u.username as username, u.profile_pic_url 
-    from tbl_action as c
-    left join tbl_user as u on c.user_id = u.id
-    where c.type='comment'
-)
 

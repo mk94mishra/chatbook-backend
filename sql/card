@@ -1,4 +1,30 @@
-1. tbl_card_post private
+1. tbl_card_post
+
+create or replace view tbl_card_post as (
+with
+al as (select post_id, count(id) as count_like from tbl_action where type='like' group by post_id),
+ac as (select post_id, count(id) as count_comment from tbl_action where type='comment' group by post_id)
+
+select 
+p.*,
+DATE_PART('day', AGE(CURRENT_TIMESTAMP,p.created_at)) AS ageing,
+u.username,u.gender,u.profile_pic_url,u.designation_id, u.lat, u.long,
+ocom.name as community_name,
+ocat.name as category_name,
+al.count_like,
+ac.count_comment
+from tbl_post as p
+left join tbl_user as u on p.user_id=u.id
+left join tbl_option as ocom on p.community_id=ocom.id
+left join tbl_option as ocat on p.category_id=ocat.id
+left join al on p.id=al.post_id
+left join ac on p.id=ac.post_id
+)
+
+
+
+
+2. tbl_card_post private
 
 with
 al as (select id,post_id,created_at from tbl_action where type='like' and user_id={logged_in_user}),
@@ -27,7 +53,7 @@ left join ab1 on p.user_id=ab1.user_id_blocked_id
 left join ab2 on p.user_id=ab2.user_id
 
 
-5. tbl_card_user
+3. tbl_card_user
 
 create or replace view tbl_card_user as (
 select 
@@ -41,51 +67,7 @@ where u.is_active=true
 )
 
   
-6. tbl_card_post
-
-create or replace view tbl_card_post as (
-with
-lp as (select post_id, count(id) as count_like from tbl_action where type='like' group by post_id),
-cp as (select post_id, count(id) as count_comment from tbl_action where type='comment' group by post_id)
-select 
-p.*,
-(DATE_PART('day', AGE(CURRENT_TIMESTAMP,p.created_at))) AS ageing,
-ocat.name as category_name,
-ocom.name as community_name,
-u.username as username,u.gender as gender,u.profile_pic_url,u.designation_id, u.lat, u.long,
-lp.count_like,
-cp.count_comment
-from tbl_post as p
-left join tbl_option as ocat on p.category_id = ocat.id
-left join tbl_option as ocom on p.community_id = ocom.id
-left join tbl_user as u on p.user_id = u.id
-left join lp on p.id = lp.post_id
-left join cp on p.id=cp.post_id
-where p.is_active=true
-)
-
-
-7. tbl_card_post_private
-with
-lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id=1),   
-bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id=1),            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id=1 group by c.post_id),
-ub as (select ub1.user_id_blocked_id  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id=1 and ub1.type='block' union select ub2.user_id  as user_id, true as is_block from tbl_action as ub2 where ub2.user_id_blocked_id=1 and ub2.type='block')
-select
-p.*,
-lpu.is_like,
-bpu.is_bookmark,
-cpu.is_comment,
-ub.is_block,
-st_distance(st_makepoint(p.lat,p.long), st_makepoint(-60437559.76521781,75051467.17286935)) as distance
-from tbl_card_post as p
-left join lpu on p.id=lpu.post_id
-left join bpu on p.id=bpu.post_id
-left join cpu on p.id=cpu.post_id
-left join ub on p.user_id=ub.user_id
-where ub.is_block isnull and lower(p.description) LIKE '%aute officia%' order by p.created_at desc nulls last limit 10 offset 
-0
-
-9. tbl_card_comment
+4. tbl_card_comment
 
 create view tbl_card_comment as (
     select 

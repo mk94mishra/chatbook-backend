@@ -23,7 +23,7 @@ left join ac on p.id=ac.post_id
 
 
 
-2. tbl_card_post private
+2. tbl_card_post_private
 
 with
 al as (select id,post_id,created_at from tbl_action where type='like' and user_id={logged_in_user}),
@@ -52,3 +52,32 @@ left join ab2 on p.user_id=ab2.user_id
 
   
 
+3. tbl_card_post_chatbook
+
+id
+description
+url 
+media
+community_id
+community_name
+category_id
+category_name
+user_id
+username
+profile_pic_url
+gender
+ageing
+designation_id
+lat
+long
+count_like
+count_comment
+
+
+action_id_like
+action_id_comment
+action_id_bookmark
+action_id_spam
+action_id_block
+action_id_block_me
+distance

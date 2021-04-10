@@ -6,7 +6,7 @@ from tortoise.transactions import in_transaction
 
 from common.response import error_response, success_response
 
-from ops.action.models import ActionPost
+from ops.action.models import Action
 from ops.action.schemas import ActionCreate
 
 router = APIRouter(prefix='/v1/private/action', tags=["action"])
@@ -39,7 +39,7 @@ async def action_post(request: Request, action_type:str, payload: ActionCreate):
     data = {k: v for k, v in data.items() if v is not None}
 
     if data['method'] == 'create':
-        action = await ActionPost.create(**data)
+        action = await Action.create(**data)
         # insert avg rating into tbl_user
         try:
             async with in_transaction() as connection:
@@ -59,22 +59,22 @@ async def action_post(request: Request, action_type:str, payload: ActionCreate):
             if (not data['comment_id']):
                 return error_response(code=400, message="must be set comment_id!")
 
-            await ActionPost(id=data['comment_id'], is_active=False).save(update_fields=['is_active'])
+            await Action(id=data['comment_id'], is_active=False).save(update_fields=['is_active'])
             return success_response({"msg":"comment deleted"}) 
         # -- block
         if action_type == 'block':
             if not data['user_id_blocked_id']:
                 return error_response(code=400, message="must be set user_id_blocked!")
-            await ActionPost.get(user_id=data['user_id'],user_id_blocked=data['user_id_blocked'],type=data['action_type']).delete()
+            await Action.get(user_id=data['user_id'],user_id_blocked=data['user_id_blocked'],type=data['action_type']).delete()
             return success_response({"msg":"unblocked!"}) 
         # -- rating
         if action_type == 'rating':
             if not data['user_id_rated_id']:
                 return error_response(code=400, message="must be set user_id_rated!")
-            await ActionPost.get(user_id=data['user_id'],user_id_blocked=data['user_id_rated_id'],type=data['action_type']).delete()
+            await Action.get(user_id=data['user_id'],user_id_blocked=data['user_id_rated_id'],type=data['action_type']).delete()
             return success_response({"msg":"un-rating deleted!"}) 
 
-        await ActionPost.get(user_id=data['user_id'], post_id=data['post_id'], type=data['action_type']).delete()
+        await Action.get(user_id=data['user_id'], post_id=data['post_id'], type=data['action_type']).delete()
         return success_response({"msg":"action deleted"})
 
     return error_response(code=400, message="something error!")

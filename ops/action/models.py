@@ -2,7 +2,7 @@ from tortoise.models import Model
 from tortoise.fields import ForeignKeyField, CharField, DatetimeField,IntField, FloatField, BooleanField
 
 
-class ActionPost(Model):
+class Action(Model):
     type = CharField(max_length=100)
 
     user = ForeignKeyField('models.User')

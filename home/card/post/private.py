@@ -20,24 +20,31 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
     self_user_long = user.long
     try:
         async with in_transaction() as connection:
-            sql = """
-            with
-            lpu as (select lpu.post_id, lpu.created_at, true as is_like from tbl_action as lpu where lpu.type='like' and lpu.user_id={logged_in_user}),
-            bpu as (select bu.post_id, bu.created_at, true as is_bookmark from tbl_action as bu where bu.type='bookmark' and bu.user_id={logged_in_user}),
-            cpu as (select c.post_id, max(c.created_at) as created_at, true as is_comment from tbl_action as c where c.type='comment' and c.user_id={logged_in_user} group by c.post_id),
-            ub as (select ub1.user_id_blocked_id  as user_id, true as is_block from tbl_action as ub1  where ub1.user_id={logged_in_user} and ub1.type='block' union select ub2.user_id as user_id, true as is_block from tbl_action as ub2  where ub2.user_id={logged_in_user} and ub2.type='block')
+            sql = """with
+            al as (select id,post_id,created_at from tbl_action where type='like' and user_id={logged_in_user}),
+            ac as (select array_agg(id) as id, post_id, max(created_at) as created_atfrom tbl_action where type='comment' and user_id={logged_in_user} group by post_id),
+            abo as (select id,post_id ,created_at from tbl_action where type='bookmark' and user_id={logged_in_user}),
+            asp as (select id,post_id ,created_at from tbl_action where type='spam' and user_id={logged_in_user}),
+            ab1 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id={logged_in_user}),
+            ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user})
+
             select 
             p.*,
-            lpu.is_like,
-            bpu.is_bookmark,
-            cpu.is_comment,
-            ub.is_block,
+            al.id as action_id_like,al.created_at as created_at_like,
+            ac.id as action_id_comment,ac.created_at as created_at_comment,
+            abo.id as action_id_bookmark,abo.created_at as created_at_bookmark,
+            asp.id as action_id_spam, asp.created_at as created_at_spam,
+            ab1.id as action_id_block,
+            ab2.id as action_id_block_me
+
             st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
             from tbl_card_post as p
-            left join lpu on p.id=lpu.post_id
-            left join bpu on p.id=bpu.post_id
-            left join cpu on p.id=cpu.post_id
-            left join ub on p.user_id=ub.user_id
+            left join al on p.id=al.post_id
+            left join ac on p.id=ac.post_id
+            left join abo on p.id=abo.post_id
+            left join asp on p.id=asp.post_id
+            left join ab1 on p.user_id=ab1.user_id_blocked_id
+            left join ab2 on p.user_id=ab2.user_id
             """.format(logged_in_user=logged_in_user, self_user_lat=self_user_lat, self_user_long=self_user_long)
 
             where = "where ub.is_block isnull"

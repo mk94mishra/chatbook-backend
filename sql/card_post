@@ -1,4 +1,4 @@
-1. tbl_card_post
+1. tbl_card_post  -- view
 
 create or replace view tbl_card_post as (
 with
@@ -23,7 +23,7 @@ left join ac on p.id=ac.post_id
 
 
 
-2. tbl_card_post_private
+2. tbl_card_post_private -- after login
 
 with
 al as (select id,post_id,created_at from tbl_action where type='like' and user_id={logged_in_user}),
@@ -52,7 +52,7 @@ left join ab2 on p.user_id=ab2.user_id
 
   
 
-3. tbl_card_post_private fields
+3. tbl_card_post_private -- fields
 
 id
 description
@@ -85,7 +85,7 @@ is_active
 
 
 
-4. fixed field
+4. fixed field for private feed
 
 is_active=true
 action_id_block isnull

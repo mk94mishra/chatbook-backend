@@ -6,7 +6,7 @@ ALTER TABLE tbl_option
 2. tbl_action
 ALTER TABLE tbl_action  
    ADD CONSTRAINT check_types 
-   CHECK ("type" IN ('like','bookmark','spam','comment','block','rating') )
+   CHECK ("type" IN ('like','comment','bookmark','spam','block','rating') )
 
 3. order by
 

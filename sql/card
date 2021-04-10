@@ -23,7 +23,6 @@ left join ac on p.id=ac.post_id
 
 
 
-
 2. tbl_card_post private
 
 with
@@ -42,7 +41,6 @@ abo.id as action_id_bookmark,abo.created_at as created_at_bookmark,
 asp.id as action_id_spam, asp.created_at as created_at_spam,
 ab1.id as action_id_block,
 ab2.id as action_id_block_me
-
 st_distance(st_makepoint(p.lat,p.long), st_makepoint({self_user_lat},{self_user_long})) as distance
 from tbl_card_post as p
 left join al on p.id=al.post_id

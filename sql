@@ -1,12 +1,3 @@
-1. tbl_option
-ALTER TABLE tbl_option  
-   ADD CONSTRAINT check_types 
-   CHECK ("type" IN ('community','category','designation') )
-
-1.a. tbl_action
-ALTER TABLE tbl_action  
-   ADD CONSTRAINT check_types 
-   CHECK ("type" IN ('like','bookmark','spam','comment','block') )
 
 2. chat group1 tbl as view
 

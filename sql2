@@ -1,4 +1,14 @@
-1. order by
+1. tbl_option
+ALTER TABLE tbl_option  
+   ADD CONSTRAINT check_types 
+   CHECK ("type" IN ('community','category','designation') )
+
+2. tbl_action
+ALTER TABLE tbl_action  
+   ADD CONSTRAINT check_types 
+   CHECK ("type" IN ('like','bookmark','spam','comment','block','rating') )
+
+3. order by
 
 insert into tbl_orderby (type, name_frontend,name_backend)
 values ('home','Latest','p.created_at desc' ),

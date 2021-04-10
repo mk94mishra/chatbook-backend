@@ -1,5 +1,4 @@
-
-2. chat group1 tbl as view
+1. chat group1 tbl as view
 
 create view tbl_chat_group1 as ( 
 select distinct on (group_id) group_id, 
@@ -13,7 +12,7 @@ from tbl_chat_msg order by group_id, created_at desc
 )
 
 
-3. chat group with user profile
+2. chat group with user profile
 
 create view tbl_chat_group as ( select 
 cg1.*,
@@ -25,7 +24,7 @@ left join tbl_user as umax on cg1.user_id_max=umax.id
 )
 
 
-4. chat user
+3. chat user
 
 select
 user_id_max as user_id, profile_pic_url_max as profile_pic_url, name_max as "name", last_msg, is_seen_min as is_seen, created_at

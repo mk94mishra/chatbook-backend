@@ -76,3 +76,36 @@ def card_post_private_response(data):
         card_post_list.append(post)
 
     return card_post_list
+
+
+def card_post_public_response(data):
+    card_post_list = list()
+    for card_single in data:
+        media_data = None
+        if card_single['media'] != None:
+            media_data = json.loads(card_single['media'])
+
+        post = {
+            "post_id":card_single['id'],
+            "created_at":card_single['created_at'],
+            "description":card_single['description'],
+            "media":media_data,
+            "community_id":card_single['community_id'],
+            "community_name":card_single['community_name'],
+            "category_id":card_single['category_id'],
+            "category_name":card_single['category_name'],
+            "user_id":card_single['user_id'],
+            "username":card_single['username'],
+            "profile_pic_url":card_single['profile_pic_url'],
+            "gender":card_single['gender'],
+            "designation_id":card_single['designation_id'],
+            "rating":card_single['rating'],
+            "ageing":card_single['ageing'],
+            "lat":card_single['lat'],
+            "long":card_single['long'],
+            "count_like":card_single['count_like'],
+            "count_comment":card_single['count_comment']
+        }
+        card_post_list.append(post)
+
+    return card_post_list

@@ -10,7 +10,7 @@ from user.models import User
 
 from home.card.query_function import card_post_private
 
-router = APIRouter(prefix='/v1/private/card-post/base', tags=["private-card-post"])
+router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
 
 
 # get card-post all

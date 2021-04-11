@@ -6,7 +6,6 @@ from ops.action.private import router as action_private_router
 from admin.option.private import router as option_private_router
 from admin.option.public import router as option_public_router
 
-from admin.orderby.public import router as orderby_public_router
 from admin.faq.public import router as faq_public_router
 from admin.official.public import router as official_public_router
 
@@ -31,7 +30,6 @@ app.include_router(action_private_router)
 # include admin
 app.include_router(option_public_router)
 app.include_router(option_private_router)
-app.include_router(orderby_public_router)
 app.include_router(faq_public_router)
 app.include_router(official_public_router)
 

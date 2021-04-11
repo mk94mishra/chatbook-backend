@@ -16,7 +16,6 @@ class Settings:
         'ops.action.models',
         #admin
         'admin.option.models',
-        'admin.orderby.models',
         'admin.faq.models',
         'admin.official.models',
         # post

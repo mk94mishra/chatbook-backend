@@ -71,8 +71,6 @@ def card_post_private_response(data):
             "created_at_bookmark":card_single['created_at_bookmark'],
             "action_id_spam":card_single['action_id_spam'],
             "created_at_spam":card_single['created_at_spam'],
-            "action_id_block":card_single['action_id_block'],
-            "action_id_block_me":card_single['action_id_block_me'],
             "distance":card_single['distance']
         }
         card_post_list.append(post)

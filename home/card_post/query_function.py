@@ -30,7 +30,7 @@ def card_post_private(**data):
         where is_active=true 
         and action_id_block isnull 
         and action_id_block_me isnull 
-        and community_id={community_id}""".format(logged_in_user=data['logged_in_user'],logged_in_lat=data['uselogged_in_lat'],logged_in_long=data['logged_in_long'],community_id=data['community_id'])
+        """.format(logged_in_user=data['logged_in_user'],logged_in_lat=data['uselogged_in_lat'],logged_in_long=data['logged_in_long'])
     
     return sql
 

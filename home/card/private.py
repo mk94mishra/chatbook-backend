@@ -29,13 +29,28 @@ async def card_post_all(request:Request,payload: Feed):
     where = ""
     if data['distance']:
         where = " and distance <= {distance}".format(distance=data['distance'])
-    if data['type'] == 'fresh':
+    if data['tab'] == 'fresh':
         order_by = "created_at desc"
-    if data['type'] == 'most-liked':
+    if data['tab'] == 'most-liked':
         order_by = "count_like desc"
-    if data['type'] == 'trending':
+    if data['tab'] == 'trending':
         where = where + " and ageing <= 1"
         order_by = "count_like desc"
+    
+    if data['type'] == 'search':
+        if not data['description']:
+            return error_response(code=400, message="must be set search text!")
+        where = where + " and description like %{description}%".format(description=data['description'])
+
+    if data['type'] == 'category':
+        if not data['category_id']:
+            return error_response(code=400, message="must be set category_id!")
+        where = where + " and category_id = {category_id}".format(category_id=data['category_id'])
+        
+    if data['type'] == 'designation':
+        if not data['designation_id']:
+            return error_response(code=400, message="must be set designation_id!")
+        where = where + " and designation_id = {designation_id}".format(designation_id=data['designation_id'])
 
     orderby = " order by {order_by} nulls last limit {limit} offset {offset}".format(order_by=order_by,limit=data['limit'],offset=data['offset'])
 

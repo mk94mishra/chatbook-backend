@@ -96,9 +96,13 @@ remark
 
 
 action_id_like
+created_at_like
 action_id_comment
+created_at_comment
 action_id_bookmark
+created_at_bookmark
 action_id_spam
+created_at_spam
 action_id_block
 action_id_block_me
 distance

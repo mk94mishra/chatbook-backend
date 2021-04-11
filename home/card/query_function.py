@@ -1,3 +1,5 @@
+import json
+
 
 def card_post_private(logged_in_user,logged_in_lat,logged_in_long,community_id):
     sql = """
@@ -31,3 +33,31 @@ def card_post_private(logged_in_user,logged_in_lat,logged_in_long,community_id):
         and community_id={community_id}""".format(logged_in_user=logged_in_user,logged_in_lat=logged_in_lat,logged_in_long=logged_in_long,community_id=community_id)
     
     return sql
+
+
+def card_post_private_response(card_post):
+    card_post_list = list()
+    for card_single in card_post:
+        media_data = None
+        if card_single['media'] != None:
+            media_data = json.loads(card_single['media'])
+
+        post = {
+            "post_id": card_single['id'],
+            "created_at": card_single['created_at'],
+            "description": card_single['description'],
+            "media": media_data,
+            "user_id": card_single['user_id'],
+            "username": card_single['username'],
+            "profile_pic_url": card_single['profile_pic_url'],
+            "designation_id": card_single['designation_id'],
+            "count_like": card_single['count_like'],
+            "count_comment": card_single['count_comment'],
+            "community_id": card_single['community_id'],
+            "category_id": card_single['category_id'],
+            "category_name": card_single['category_name'],
+            "distance":card_single['distance'],
+            "action_id_like":card_single['action_id_like'],
+            "action_id_bookmark":card_single['action_id_bookmark']
+        }
+        card_post_list.append(post)

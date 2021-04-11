@@ -8,7 +8,7 @@ from common.response import error_response, success_response
 
 from user.models import User
 
-from home.card.query_function import card_post_private
+from home.card.query_function import card_post_private, card_post_private_response
 
 router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
 
@@ -30,32 +30,7 @@ async def card_post_fresh(request:Request, limit: Optional[int] = 10, offset: Op
             sql = sql + orderby
 
             card_post = await connection.execute_query(sql)
-            card_post_list = list()
-            for card_single in card_post[1]:
-                media_data = None
-                if card_single['media'] != None:
-                    media_data = json.loads(card_single['media'])
-
-                post = {
-                    "post_id": card_single['id'],
-                    "created_at": card_single['created_at'],
-                    "description": card_single['description'],
-                    "media": media_data,
-                    "user_id": card_single['user_id'],
-                    "username": card_single['username'],
-                    "profile_pic_url": card_single['profile_pic_url'],
-                    "designation_id": card_single['designation_id'],
-                    "count_like": card_single['count_like'],
-                    "count_comment": card_single['count_comment'],
-                    "community_id": card_single['community_id'],
-                    "category_id": card_single['category_id'],
-                    "category_name": card_single['category_name'],
-                    "distance":card_single['distance'],
-                    "action_id_like":card_single['action_id_like'],
-                    "action_id_bookmark":card_single['action_id_bookmark']
-                }
-                card_post_list.append(post)
-            return success_response(card_post_list)
+            return success_response(card_post_private_response(card_post[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
 

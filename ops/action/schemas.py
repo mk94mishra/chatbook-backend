@@ -11,7 +11,6 @@ class ActionCreate(BaseModel):
     user_id_blocked_id: Optional[int]= None
     user_id_rated_id: Optional[int]= None
     rating: Optional[float]= None
-    method: str
 
 
 

@@ -8,8 +8,8 @@ class Post(AbstractBaseModel):
     category = ForeignKeyField('models.Option',related_name='post_category')
     description = CharField(max_length=5000, null=True)
     media = JSONField(null=True)
-    is_spam = BooleanField(default=False)
-    is_deleted = BooleanField(default=False)
+
+    remark = CharField(max_length=200, null=True)
 
     class Meta:
         table = "tbl_post"

@@ -118,7 +118,7 @@ async def user_delete(request: Request, user_id:int, payload: UserDelete):
             await connection.execute_query(sql)
             print(sql)
 
-            sql = "update tbl_post set is_active=False, is_deleted=True where user_id={user_id}".format(user_id=user_id)
+            sql = "update tbl_post set is_active=False, updated_by={user_id}, remark='by user' where user_id={user_id} and is_active=True".format(user_id=user_id)
             await connection.execute_query(sql)
 
             return success_response({"msg": "data deleted!"})

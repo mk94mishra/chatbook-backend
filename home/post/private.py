@@ -3,7 +3,6 @@ from typing import Optional
 from fastapi import APIRouter, Request, status, HTTPException, Depends
 from tortoise.exceptions import DoesNotExist, OperationalError
 from tortoise.transactions import in_transaction
-from system.settings import settings
 
 from common.validation import form_validation, media_validation
 from common.response import error_response, success_response
@@ -62,7 +61,7 @@ async def post_delete(request: Request, post_id: int):
     data = dict()
     data['updated_by'] = request.state.user_id
     data['is_active'] = False
-    data['is_deleted'] = True
+    data['remark'] = "by user"
     # post delete 
     await Post(id=post_id, **data).save(update_fields=data.keys())
     return success_response({"msg":"data deleted!"})

@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-class Search(BaseModel):
+class Feed(BaseModel):
     feed: str # fresh
     distance:  Optional[int] = None 
     limit: Optional[int] = 10

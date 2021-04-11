@@ -8,7 +8,7 @@ from common.response import error_response, success_response
 
 from user.models import User
 
-from home.card.schemas import Search
+from home.card.schemas import Feed
 from home.card.query_function import card_post_private, card_post_private_response
 
 router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
@@ -16,7 +16,7 @@ router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
 
 # get card-post all
 @router.post("", status_code=status.HTTP_200_OK)
-async def card_post_fresh(request:Request,payload: Search):
+async def card_post_all(request:Request,payload: Feed):
     data = deepcopy(payload.dict())
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)

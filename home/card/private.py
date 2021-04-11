@@ -20,10 +20,14 @@ async def card_post_fresh(request:Request, limit: Optional[int] = 10, offset: Op
     user = await User.get(id=logged_in_user)
     logged_in_lat = user.lat
     logged_in_long = user.long
-    user_community_id = user.community_id
+    logged_in_community_id = user.community_id
+
     try:
         async with in_transaction() as connection:
-            sql = card_post_private(logged_in_user,logged_in_lat,logged_in_long,community_id)
+            sql = card_post_private(logged_in_user,logged_in_lat,logged_in_long,logged_in_community_id)
+            
+            orderby = " order by and created_at desc nulls last limit {limit} offset {offset}".format( limit=limit,offset=offset)
+            sql = sql + orderby
             card_post = await connection.execute_query(sql)
             card_post_list = list()
             for card_single in card_post[1]:

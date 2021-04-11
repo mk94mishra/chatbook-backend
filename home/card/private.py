@@ -23,9 +23,6 @@ async def card_post_all(request:Request, community_id: Optional[int] = 0,categor
     try:
         async with in_transaction() as connection:
             sql = card_post_private(logged_in_user,logged_in_lat,logged_in_long)
-
-            where = " where is_active=true and action_id_block isnull and action_id_block_me isnull"
-            sql = sql + where
             card_post = await connection.execute_query(sql)
             card_post_list = list()
             for card_single in card_post[1]:

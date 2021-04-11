@@ -110,7 +110,7 @@ action_id_block_me
 distance
 
 
-3. feed - base
+3. feed - base filter
 
 is_active=true
 action_id_block isnull

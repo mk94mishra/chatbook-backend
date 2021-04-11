@@ -24,6 +24,7 @@ def card_post_private(logged_in_user,logged_in_lat,logged_in_long):
         left join abo on p.id=abo.post_id
         left join asp on p.id=asp.post_id
         left join ab1 on p.user_id=ab1.user_id_blocked_id
-        left join ab2 on p.user_id=ab2.user_id""".formate(logged_in_user=logged_in_user,logged_in_lat=logged_in_lat,logged_in_long=logged_in_long)
+        left join ab2 on p.user_id=ab2.user_id
+        where is_active=true and action_id_block isnull and action_id_block_me isnull """.formate(logged_in_user=logged_in_user,logged_in_lat=logged_in_lat,logged_in_long=logged_in_long)
     
     return sql

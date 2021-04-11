@@ -35,9 +35,9 @@ def card_post_private(**data):
     return sql
 
 
-def card_post_private_response(card_post):
+def card_post_private_response(data):
     card_post_list = list()
-    for card_single in card_post:
+    for card_single in data:
         media_data = None
         if card_single['media'] != None:
             media_data = json.loads(card_single['media'])

@@ -23,7 +23,6 @@ async def card_post_fresh(request:Request, limit: Optional[int] = 10, offset: Op
         "logged_in_long" :user.long,
         "logged_in_community_id": user.community_id,
     }
-
     try:
         async with in_transaction() as connection:
             sql = card_post_private(**user_data)

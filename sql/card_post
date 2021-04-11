@@ -108,10 +108,10 @@ action_id_block_me
 distance
 
 
-
-4. fixed field for private feed
+3. feed - base
 
 is_active=true
 action_id_block isnull
 action_id_block_me isnull
+
 community_id = user.community_id

@@ -15,11 +15,12 @@ router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
 
 # get card-post all
 @router.get("/fresh", status_code=status.HTTP_200_OK)
-async def card_post_all(request:Request, community_id: Optional[int] = 0,category_id: Optional[int] = 0, designation_id: Optional[int] = 0, description: Optional[str] = None, trending: Optional[bool] = None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'created_at desc'):
+async def card_post_fresh(request:Request, limit: Optional[int] = 10, offset: Optional[int] = 0):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     logged_in_lat = user.lat
     logged_in_long = user.long
+    user_community_id = user.community_id
     try:
         async with in_transaction() as connection:
             sql = card_post_private(logged_in_user,logged_in_lat,logged_in_long,community_id)

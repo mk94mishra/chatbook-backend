@@ -12,9 +12,9 @@ from ops.action.schemas import ActionCreate
 router = APIRouter(prefix='/v1/private/action', tags=["action"])
 
 
-# create/delete action
+# create action
 @router.post("/type/{action_type}", status_code=status.HTTP_201_CREATED)
-async def action_post(request: Request, action_type:str, payload: ActionCreate):
+async def action_post_create(request: Request, action_type:str, payload: ActionCreate):
     data = deepcopy(payload.dict())
 
     # self user check
@@ -55,6 +55,16 @@ async def action_post(request: Request, action_type:str, payload: ActionCreate):
         return success_response(action)
 
 
+# delete action
+@router.delete("/{action_id}", status_code=status.HTTP_200_OK)
+async def action_delete(request: Request,action_id:int):
+    # self user check
+    user_id = int(request.state.user_id)
+    await Action.get(id=action_id, user_id=user_id).delete()
+    return success_response({"msg":"action deleted!"})
+
+
+
 # get block 
 @router.get("/type/{action_type}/block-list", status_code=status.HTTP_200_OK)
 async def user_block_list(request: Request, action_type:str, limit: Optional[int] = 10, offset: Optional[int] = 0):
@@ -76,11 +86,3 @@ async def user_block_list(request: Request, action_type:str, limit: Optional[int
             return success_response(blocked_user[1])
     except OperationalError:
         return error_response(code=400, message="something error!")
-
-# delete action
-@router.delete("/{action_id}", status_code=status.HTTP_200_OK)
-async def user_block_list(request: Request,action_id:int):
-    # self user check
-    user_id = int(request.state.user_id)
-    await Action.get(id=action_id, user_id=user_id).delete()
-    return success_response({"msg":"action deleted!"})

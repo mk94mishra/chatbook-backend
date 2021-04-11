@@ -18,13 +18,15 @@ router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
 async def card_post_fresh(request:Request, limit: Optional[int] = 10, offset: Optional[int] = 0):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
-    logged_in_lat = user.lat
-    logged_in_long = user.long
-    logged_in_community_id = user.community_id
+    user_data = {
+        "logged_in_lat" :user.lat,
+        "logged_in_long" :user.long,
+        "logged_in_community_id": user.community_id,
+    }
 
     try:
         async with in_transaction() as connection:
-            sql = card_post_private(logged_in_user,logged_in_lat,logged_in_long,logged_in_community_id)
+            sql = card_post_private(**user_data)
             
             orderby = " order by created_at desc nulls last limit {limit} offset {offset}".format( limit=limit,offset=offset)
             sql = sql + orderby

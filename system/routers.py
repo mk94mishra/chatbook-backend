@@ -12,10 +12,8 @@ from admin.official.public import router as official_public_router
 
 # post section import
 from home.post.private import router as post_private_router
-from home.card.post.public import router as card_post_public_router
-from home.card.post.private import router as card_post_private_router
-from home.card.comment.public import router as card_comment_public_router
-from home.card.comment.private import router as card_comment_private_router
+from home.card.public import router as card_post_public_router
+from home.card.private import router as card_post_private_router
 
 
 from fastapi import FastAPI
@@ -40,5 +38,3 @@ app.include_router(official_public_router)
 app.include_router(post_private_router)
 app.include_router(card_post_public_router)
 app.include_router(card_post_private_router)
-app.include_router(card_comment_public_router)
-app.include_router(card_comment_private_router)

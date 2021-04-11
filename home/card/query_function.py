@@ -1,7 +1,7 @@
 import json
 
 
-def card_post_private(logged_in_user,logged_in_lat,logged_in_long,community_id):
+def card_post_private(**data):
     sql = """
         with
         al as (select id,post_id,created_at from tbl_action where type='like' and user_id={logged_in_user}),
@@ -30,7 +30,7 @@ def card_post_private(logged_in_user,logged_in_lat,logged_in_long,community_id):
         where is_active=true 
         and action_id_block isnull 
         and action_id_block_me isnull 
-        and community_id={community_id}""".format(logged_in_user=logged_in_user,logged_in_lat=logged_in_lat,logged_in_long=logged_in_long,community_id=community_id)
+        and community_id={community_id}""".format(logged_in_user=data['logged_in_user'],logged_in_lat=data['uselogged_in_lat'],logged_in_long=data['logged_in_long'],community_id=data['community_id'])
     
     return sql
 
@@ -43,21 +43,38 @@ def card_post_private_response(card_post):
             media_data = json.loads(card_single['media'])
 
         post = {
-            "post_id": card_single['id'],
-            "created_at": card_single['created_at'],
-            "description": card_single['description'],
-            "media": media_data,
-            "user_id": card_single['user_id'],
-            "username": card_single['username'],
-            "profile_pic_url": card_single['profile_pic_url'],
-            "designation_id": card_single['designation_id'],
-            "count_like": card_single['count_like'],
-            "count_comment": card_single['count_comment'],
-            "community_id": card_single['community_id'],
-            "category_id": card_single['category_id'],
-            "category_name": card_single['category_name'],
-            "distance":card_single['distance'],
+            "post_id":card_single['id'],
+            "created_at":card_single['created_at'],
+            "description":card_single['description'],
+            "media":media_data,
+            "community_id":card_single['community_id'],
+            "community_name":card_single['community_name'],
+            "category_id":card_single['category_id'],
+            "category_name":card_single['category_name'],
+            "user_id":card_single['user_id'],
+            "username":card_single['username'],
+            "profile_pic_url":card_single['profile_pic_url'],
+            "gender":card_single['gender'],
+            "designation_id":card_single['designation_id'],
+            "rating":card_single['rating'],
+            "ageing":card_single['ageing'],
+            "lat":card_single['lat'],
+            "long":card_single['long'],
+            "count_like":card_single['count_like'],
+            "count_comment":card_single['count_comment'],
+
             "action_id_like":card_single['action_id_like'],
-            "action_id_bookmark":card_single['action_id_bookmark']
+            "created_at_like":card_single['created_at_like'],
+            "action_id_comment":card_single['action_id_comment'],
+            "created_at_comment":card_single['created_at_comment'],
+            "action_id_bookmark":card_single['action_id_bookmark'],
+            "created_at_bookmark":card_single['created_at_bookmark'],
+            "action_id_spam":card_single['action_id_spam'],
+            "created_at_spam":card_single['created_at_spam'],
+            "action_id_block":card_single['action_id_block'],
+            "action_id_block_me":card_single['action_id_block_me'],
+            "distance":card_single['distance']
         }
         card_post_list.append(post)
+
+    return card_post_list

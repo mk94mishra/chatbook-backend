@@ -19,7 +19,26 @@ left join tbl_option as ocom on p.community_id=ocom.id
 left join tbl_option as ocat on p.category_id=ocat.id
 left join al on p.id=al.post_id
 left join ac on p.id=ac.post_id
+where p.is_active=true
 )
+
+id
+description
+media
+community_id
+community_name
+category_id
+category_name
+user_id
+username
+profile_pic_url
+gender
+ageing
+designation_id
+lat
+long
+count_like
+count_comment
 
 
 
@@ -56,7 +75,6 @@ left join ab2 on p.user_id=ab2.user_id
 
 id
 description
-url 
 media
 community_id
 community_name

@@ -1,0 +1,13 @@
+1. tbl_card_comment
+
+create or replace view tbl_card_comment as (
+    with 
+    ac as (select id, post_id, user_id, description, media_url, created_at from tbl_action where type='comment')
+    
+    select 
+    ac.*,
+    u.username, u.profile_pic_url, u.rating
+    from ac 
+    left join tbl_user as u on ac.user_id=u.id
+
+)

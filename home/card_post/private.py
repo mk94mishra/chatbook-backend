@@ -8,8 +8,8 @@ from common.response import error_response, success_response
 
 from user.models import User
 
-from home.card.schemas import Feed
-from home.card.query_function import card_post_private, card_post_private_response
+from home.card_post.schemas import Feed
+from home.card_post.query_function import card_post_private, card_post_private_response
 
 router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
 

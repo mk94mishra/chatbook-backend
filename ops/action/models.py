@@ -18,8 +18,6 @@ class Action(Model):
 
     created_at = DatetimeField(auto_now_add=True)
 
-    is_active = BooleanField(default=True, null=True)
-
     class Meta:
         table = "tbl_action"
         unique_together = (("user", "post","type"),("user","user_id_blocked"),("user","user_id_rated") )

@@ -76,3 +76,11 @@ async def user_block_list(request: Request, action_type:str, limit: Optional[int
             return success_response(blocked_user[1])
     except OperationalError:
         return error_response(code=400, message="something error!")
+
+# delete action
+@router.delete("/{action_id}", status_code=status.HTTP_200_OK)
+async def user_block_list(request: Request,action_id:int):
+    # self user check
+    user_id = int(request.state.user_id)
+    await Action.get(id=action_id, user_id=user_id).delete()
+    return success_response({"msg":"action deleted!"})

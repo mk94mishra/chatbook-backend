@@ -29,6 +29,8 @@ community_id
 community_name
 category_id
 category_name
+is_active
+remark
 user_id
 username
 profile_pic_url
@@ -39,7 +41,7 @@ lat
 long
 count_like
 count_comment
-
+created_at
 
 
 2. tbl_card_post_private -- after login

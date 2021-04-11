@@ -114,32 +114,6 @@ async def user_login_password(request: Request, payload: UserLoginPassword):
         return error_response(code=404, message="phone number not exist!")
 
 
-# get user
-@router.get("/{user_id}", status_code=status.HTTP_200_OK)
-async def user_read(request: Request, user_id:int):
-
-    try:
-        async with in_transaction() as connection:
-            sql = """select u.id as id, u.username as username, u.phone as phone, 
-                u.profile_pic_url as profile_pic_url,u.gender,u.dob,u.community_id as community_id, u.community_name as community_name , 
-                ut.id as user_type_id, ut.name as user_type_name
-                from (SELECT u.*,com.name as community_name
-                from tbl_user as u
-                left join tbl_community as com 
-                on u.community_id = com.id) as u
-                left join tbl_user_type as ut
-                on u.user_type_id=ut.id
-                """
-
-            filter = " where u.is_active = 'true' and  u.id={user_id}".format(user_id=user_id)
-            sql = sql + filter
-
-            user = await connection.execute_query(sql)
-            return success_response(user[1])
-    except OperationalError:
-        return error_response(code=400, message="something error!")
-
-
 #  user check
 @router.get("/user-check/{user_id}", status_code=status.HTTP_200_OK)
 async def user_check(request: Request, user_id:int):

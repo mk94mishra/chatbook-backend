@@ -31,6 +31,9 @@ async def card_comment_all(request:Request,post_id:int,limit: Optional[int] = 10
 # get card-comment user
 @router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
 async def card_comment_user(request:Request,user_id:int,limit: Optional[int] = 10, offset: Optional[int] = 0):
+    # self user check
+    if int(user_id) != int(request.state.user_id):
+        return error_response(code=401, message="you don't have permission!")
     
     sql = "select * from tbl_card_comment"
     where = " where user_id={user_id}".format(user_id=user_id)

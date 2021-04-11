@@ -8,7 +8,7 @@ ac as (select post_id, count(id) as count_comment from tbl_action where type='co
 select 
 p.*,
 DATE_PART('day', AGE(CURRENT_TIMESTAMP,p.created_at)) AS ageing,
-u.username,u.gender,u.profile_pic_url,u.designation_id, u.lat, u.long,
+u.username,u.gender,u.profile_pic_url,u.designation_id, u.rating, u.lat, u.long,
 ocom.name as community_name,
 ocat.name as category_name,
 al.count_like,
@@ -35,6 +35,7 @@ username
 profile_pic_url
 gender
 designation_id
+rating
 ageing
 lat
 long
@@ -86,6 +87,7 @@ username
 profile_pic_url
 gender
 designation_id
+rating
 ageing
 lat
 long

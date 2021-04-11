@@ -37,6 +37,9 @@ async def card_post_all(request:Request,payload: Feed):
         where = where + " and ageing <= 1"
         order_by = "count_like desc"
     
+    if data['type'] == 'home':
+        pass
+
     if data['type'] == 'search':
         if not data['description']:
             return error_response(code=400, message="must be set search text!")
@@ -46,7 +49,7 @@ async def card_post_all(request:Request,payload: Feed):
         if not data['category_id']:
             return error_response(code=400, message="must be set category_id!")
         where = where + " and category_id = {category_id}".format(category_id=data['category_id'])
-        
+
     if data['type'] == 'designation':
         if not data['designation_id']:
             return error_response(code=400, message="must be set designation_id!")

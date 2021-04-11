@@ -10,6 +10,7 @@ def card_post_private(**data):
         asp as (select id,post_id ,created_at from tbl_action where type='spam' and user_id={logged_in_user}),
         ab1 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id={logged_in_user}),
         ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user})
+        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where user_id={logged_in_user} and is_activated isnull group by receiver_id)
 
         select 
         p.*,
@@ -19,7 +20,8 @@ def card_post_private(**data):
         asp.id as action_id_spam, asp.created_at as created_at_spam,
         ab1.id as action_id_block,
         ab2.id as action_id_block_me,
-        st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) as distance
+        st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) as distance,
+        cr.count_pending_request
         from tbl_card_post as p
         left join al on p.id=al.post_id
         left join ac on p.id=ac.post_id
@@ -27,6 +29,7 @@ def card_post_private(**data):
         left join asp on p.id=asp.post_id
         left join ab1 on p.user_id=ab1.user_id_blocked_id
         left join ab2 on p.user_id=ab2.user_id
+        left join cr on p.user_id=cr.receiver_id
         where is_active=true 
         and ab1.id isnull
         and ab2.id isnull
@@ -71,7 +74,8 @@ def card_post_private_response(data):
             "created_at_bookmark":card_single['created_at_bookmark'],
             "action_id_spam":card_single['action_id_spam'],
             "created_at_spam":card_single['created_at_spam'],
-            "distance":card_single['distance']
+            "distance":card_single['distance'],
+            "count_pending_request": card_single['count_pending_request']
         }
         card_post_list.append(post)
 

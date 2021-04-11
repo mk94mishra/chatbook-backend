@@ -10,11 +10,11 @@ from user.models import User
 
 from home.card.query_function import card_post_private
 
-router = APIRouter(prefix='/v1/private', tags=["private-card-post"])
+router = APIRouter(prefix='/v1/private/card-post/base', tags=["private-card-post"])
 
 
 # get card-post all
-@router.get("/card-post", status_code=status.HTTP_200_OK)
+@router.get("/fresh", status_code=status.HTTP_200_OK)
 async def card_post_all(request:Request, community_id: Optional[int] = 0,category_id: Optional[int] = 0, designation_id: Optional[int] = 0, description: Optional[str] = None, trending: Optional[bool] = None, limit: Optional[int] = 10, offset: Optional[int] = 0, order_by: Optional[str] = 'created_at desc'):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)

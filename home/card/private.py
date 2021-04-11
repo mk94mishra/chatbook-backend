@@ -25,17 +25,23 @@ async def card_post_all(request:Request,payload: Feed):
         "logged_in_long" :user.long,
         "logged_in_community_id": user.community_id
     }
+    sql = card_post_private(**user_data)
+    where = ""
+    if data['distance']:
+        where = " and distance <= {distance}".format(distance=data['distance'])
+    if data['type'] == 'fresh':
+        order_by = "created_at desc"
+    if data['type'] == 'most-liked':
+        order_by = "count_like desc"
+    if data['type'] == 'trending':
+        where = where + " and ageing <= 1"
+        order_by = "count_like desc"
+
+    orderby = " order by {order_by} nulls last limit {limit} offset {offset}".format(order_by=order_by,limit=data['limit'],offset=data['offset'])
+
+    sql = sql + where + orderby
     try:
         async with in_transaction() as connection:
-            sql = card_post_private(**user_data)
-
-            where = ""
-            if data['distance']:
-                where = " and distance <= {distance}".format(distance=data['distance'])
-
-            orderby = " order by created_at desc nulls last limit {limit} offset {offset}".format( limit=data['limit'],offset=data['offset'])
-            sql = sql + where + orderby
-
             card_post = await connection.execute_query(sql)
             return success_response(card_post_private_response(card_post[1]))
     except OperationalError:

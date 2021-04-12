@@ -39,7 +39,7 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
         if not data['user_id_blocked_id']:
             return error_response(code=400, message="must be fill user_id_blocked!")
     if action_type == 'rating':
-        if (not data['user_id_rated_id']) or (not data['rating']):
+        if (not data['user_id_rated_id']) & (not data['rating']):
             return error_response(code=400, message="must be fill user_id_rated & rating!")
 
     data = {k: v for k, v in data.items() if v is not None}

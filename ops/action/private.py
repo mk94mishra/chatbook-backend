@@ -42,6 +42,11 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
     if action_type == 'rating':
         if (not data['user_id_rated_id']) & (not data['rating']):
             return error_response(code=400, message="must be fill user_id_rated & rating!")
+        rating_exist = await Action.get(user_id=data['user_id'],user_id_rated_id=data['user_id_rated_id'])
+        if rating_exist:
+            await Action(id=rating_exist.id, **data).save(update_fields=data.keys())
+            update_avg_rating(data['user_id_rated_id'])
+            return success_response(data)
 
     data = {k: v for k, v in data.items() if v is not None}
     action = await Action.create(**data)

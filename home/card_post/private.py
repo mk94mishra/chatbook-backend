@@ -21,7 +21,8 @@ async def card_post_all(request:Request,payload: Feed):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     logged_in_community_id = user.community_id
-    logged_in_community_id = 1 # test
+    if user.community_id == None:
+        return error_response(code=400, message="must be set community!")
     user_data = {
         "logged_in_user": logged_in_user,
         "logged_in_lat" :user.lat,

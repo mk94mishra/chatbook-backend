@@ -9,7 +9,7 @@ from common.response import error_response, success_response
 from user.models import User
 
 from home.card_post.schemas import Feed
-from admin.func.query_function import card_post_private, card_post_private_response
+from admin.helper.helper.py import card_post_private, card_post_private_response
 
 router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
 

@@ -8,7 +8,7 @@ from common.validation import form_validation, media_validation
 from common.response import error_response, success_response
 
 from home.post.models import Post
-from home.post.schemas import PostCreate, PostUpdate
+from home.post.schemas import PostCreate
 
 from user.models import User
 

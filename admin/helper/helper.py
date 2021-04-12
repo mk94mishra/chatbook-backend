@@ -2,6 +2,7 @@ import json
 from tortoise.exceptions import DoesNotExist, OperationalError
 from tortoise.transactions import in_transaction
 
+from common.response import error_response, success_response
 
 def card_post_private(**data):
     sql = """
@@ -117,13 +118,13 @@ def card_post_public_response(data):
     return card_post_list
 
 
-def update_avg_rating(user_id:int):
+def update_avg_rating(user_id):
     try:
-            async with in_transaction() as connection:
-                sql = """update tbl_user set rating=r.rating
-                from (select avg(rating) as rating from tbl_action where user_id_rated_id={user_id} and type='rating') as r
-                where id = {user_id}
-                """.format(user_id =user_id)
-                await connection.execute_query(sql)
-        except OperationalError:
-            return error_response(code=400, message="something error!")
+        with in_transaction() as connection:
+            sql = """update tbl_user set rating=r.rating
+            from (select avg(rating) as rating from tbl_action where user_id_rated_id={user_id} and type='rating') as r
+            where id = {user_id}
+            """.format(user_id =user_id)
+            connection.execute_query(sql)
+    except OperationalError:
+        return error_response(code=400, message="something error!")

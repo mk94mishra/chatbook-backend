@@ -9,7 +9,7 @@ from common.response import error_response, success_response
 from user.models import User
 
 from home.card_post.schemas import Feed
-from admin.helper.helper.py import card_post_public_response
+from admin.helper.helper import card_post_public_response
 
 router = APIRouter(prefix='/v1/public/card-post', tags=["public-card-post"])
 

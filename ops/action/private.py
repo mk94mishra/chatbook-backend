@@ -5,7 +5,7 @@ from tortoise.exceptions import DoesNotExist, OperationalError
 from tortoise.transactions import in_transaction
 
 from common.response import error_response, success_response
-
+from admin.func.query_function import update_avg_rating
 from ops.action.models import Action
 from ops.action.schemas import ActionCreate
 
@@ -44,20 +44,12 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
 
     data = {k: v for k, v in data.items() if v is not None}
     action = await Action.create(**data)
-    
+
     # insert avg rating into tbl_user
     if action_type == 'rating':
-        try:
-            async with in_transaction() as connection:
-                sql = """update tbl_user set rating=r.rating
-                from (select avg(rating) as rating from tbl_action where user_id_rated_id={user_id_rated_id} and type='rating') as r
-                where id = {user_id_rated_id}
-                """.format(user_id_rated_id =data['user_id_rated_id'] )
-                await connection.execute_query(sql)
-        except OperationalError:
-            return error_response(code=400, message="something error!")
-
-        return success_response(action)
+        update_avg_rating(data['user_id_rated_id'])
+        
+    return success_response(action)
 
 
 # delete action

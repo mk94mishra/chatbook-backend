@@ -123,7 +123,36 @@ def card_post_public_response(data):
 
     return card_post_list
 
+def card_comment_private(**data):
+    sql = """
+        with
+        acl as (select id,comment_id,created_at from tbl_action where type='comment-like' and user_id={logged_in_user}),
+        ar as (select id,user_id_rated, rating,created_at from tbl_action where type='rating' and user_id={logged_in_user}),
+        ab1 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id={logged_in_user}),
+        ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user})
+        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where user_id={logged_in_user} and is_activated isnull group by receiver_id)
 
+        select 
+        c.*,
+        acl.id as action_comment_like_id,acl.created_at as action_comment_like_created_at,
+        ar.id as action_rating_id, ar.rating as action_rated, ar.created_at as action_rating_created_at,
+        ab1.id as action_id_block,
+        ab2.id as action_id_block_me,
+        st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) as distance,
+        cr.count_pending_request
+        from tbl_card_comment as c
+        left join acl on c.id=acl.comment_id
+        left join ar on c.user_id=ar.user_id_rated
+        left join ab1 on c.user_id=ab1.user_id_blocked_id
+        left join ab2 on c.user_id=ab2.user_id
+        left join cr on c.user_id=cr.receiver_id
+        where 
+        ab1.id isnull
+        and ab2.id isnull
+        """.format(logged_in_user=data['logged_in_user'],logged_in_lat=data['logged_in_lat'],logged_in_long=data['logged_in_long'])
+    
+    return sql
+    
 def update_avg_rating(user_id):
     try:
         with in_transaction() as connection:

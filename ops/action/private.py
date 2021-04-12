@@ -71,22 +71,27 @@ async def action_delete(request: Request,action_id:int):
 
 
 # get block 
-@router.get("/type/{action_type}/block-list", status_code=status.HTTP_200_OK)
-async def user_block_list(request: Request, action_type:str, limit: Optional[int] = 10, offset: Optional[int] = 0):
+@router.get("/block-list", status_code=status.HTTP_200_OK)
+async def user_block_list(request: Request, limit: Optional[int] = 10, offset: Optional[int] = 0):
     # self user check
-    user_id = int(request.state.user_id)
+    logged_user_id = int(request.state.user_id)
 
     try:
         async with in_transaction() as connection:
-            sql = """select ab.id as action_id_block, ab.user_id_blocked, ab.created_at,
-            u.name as username, u.profile_pic_url
-            from tbl_action as ab
-            left join tbl_user as u on ab.user_id_blocked = u.id"""
+            sql = """
+            with 
+            ab as (select id, created_at,user_id_blocked_id, from tbl_action where user_id={logged_user_id} and type='block')
 
-            where = " where ab.user_id = {user_id}".format(user_id=user_id)
+            select
+            ab.id as action_block_id, ab.user_id_blocked_id, ab.created_at as action_block_created_at,
+            u.username,u.profile_pic_url
+            from ab
+            left join tbl_user as u on ab.user_id_blocked_id=u.id
+            """.format(logged_user_id=logged_user_id)
+
             orderby = " order by ab.created_at desc limit {limit} offset {offset}".format(limit=limit,offset=offset)
 
-            sql = sql + where + orderby
+            sql = sql + orderby
             blocked_user = await connection.execute_query(sql)            
             return success_response(blocked_user[1])
     except OperationalError:

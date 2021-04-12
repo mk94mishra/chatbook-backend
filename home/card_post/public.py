@@ -15,15 +15,14 @@ router = APIRouter(prefix='/v1/public/card-post', tags=["public-card-post"])
 
 
 # get card-post all
-@router.post("", status_code=status.HTTP_200_OK)
-async def card_post_all(request:Request,payload: Feed):
+@router.get("", status_code=status.HTTP_200_OK)
+async def card_post_all(request:Request,limit: Optional[int] = 10, offset: Optional[int] = 0):
     data = deepcopy(payload.dict())
 
     sql = " select * from tbl_card_post"
-    where = "  where ageing <= 30"
     orderby = " order by count_like desc nulls last limit {limit} offset {offset}".format(limit=data['limit'],offset=data['offset'])
 
-    sql = sql + where + orderby
+    sql = sql + orderby
     try:
         async with in_transaction() as connection:
             card_post = await connection.execute_query(sql)

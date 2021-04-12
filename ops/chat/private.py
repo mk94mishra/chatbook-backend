@@ -12,7 +12,6 @@ from common.response import error_response, success_response
 from ops.chat.models import Chat, ChatRequest
 from ops.chat.schemas import ChatCreate, ChatUpdate, ChatRequestConfirm, ChatRequestCheck
 
-
 router = APIRouter(prefix='/v1/private', tags=["chat"])
 
 
@@ -59,23 +58,28 @@ async def chat_request_create(request: Request, payload: ChatCreate):
 # chat request pending list
 @router.get("/chat/request-pending/user/{user_id}", status_code=status.HTTP_200_OK)
 async def chat_request_pending(request: Request, user_id: int):
+    # self user check
+    if int(user_id) != int(request.state.user_id):
+        return error_response(code=401, message="you don't have permission!")
+
     try:
         async with in_transaction() as connection:
             sql = """
-            select 
-            c.* ,
-            u.username as username, u.profile_pic_url, u.rating
-            from tbl_chat_request as c
-            left join tbl_user as u on c.receiver_id=c.id
-            where c.receiver_id = {user_id}
+            with 
+            cr as (select id, created_at,sender_id from tbl_chat_request where receiver_id={user_id} and is_activated isnull)
+
+            select
+            cr.id , cr.sender_id , cr.created_at,
+            u.username,u.profile_pic_url
+            from cr
+            left join tbl_user as u on cr.sender_id=u.id
             """.format(user_id=user_id)
             
-            await connection.execute_query(sql)
-            return success_response({"msg": "data created!"})
+            pending_request = await connection.execute_query(sql)
+            return success_response(pending_request[1])
     except OperationalError:
         return error_response(code=400, message="something error!")
 
-    return success_response(await ChatRequest.filter(user_id=user_id, is_activated=None)).order_by('-created_at')
 
 
 # chat request true false

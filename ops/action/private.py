@@ -24,15 +24,17 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
     data['type'] = action_type
 
     if action_type == 'like':
-        pass
+        if (not data['post_id']):
+            return error_response(code=400, message="must be set post_id!")
     if action_type == 'comment':
-        if (not data['description']) & (not data['media_url']):
-            return error_response(code=400, message="must be set description or media!")
+        if (not data['post_id']) & (not data['description']) & (not data['media_url']):
+            return error_response(code=400, message="must be set post_id, description or media!")
     if action_type == 'bookmark':
-        pass
+        if (not data['post_id']):
+            return error_response(code=400, message="must be set post_id!")
     if action_type == 'spam':
-        if not data['description']:
-            return error_response(code=400, message="must be fill description!")
+        if (not data['post_id']) & (not data['description']):
+            return error_response(code=400, message="must be set post_id & description!")
     if action_type == 'block':
         if not data['user_id_blocked_id']:
             return error_response(code=400, message="must be fill user_id_blocked!")

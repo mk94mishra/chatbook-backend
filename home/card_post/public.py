@@ -32,7 +32,7 @@ async def card_post_all(request:Request,limit: Optional[int] = 10, offset: Optio
 
 # get card-post single
 @router.get("/post/{post_id}", status_code=status.HTTP_200_OK)
-async def card_post_all(request:Request,post_id: str):
+async def card_post_single(request:Request,post_id: str):
     sql = "select * from tbl_card_post"
     where = " where id = {post_id}".format(post_id=post_id)
     

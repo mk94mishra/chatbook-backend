@@ -43,8 +43,8 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
             return error_response(code=400, message="must be fill user_id_rated & rating!")
 
     data = {k: v for k, v in data.items() if v is not None}
-
     action = await Action.create(**data)
+    
     # insert avg rating into tbl_user
     if action_type == 'rating':
         try:

@@ -33,6 +33,8 @@ async def card_post_all(request:Request,payload: Feed):
 
     if data['distance']:
         where = where + " and distance <= {distance}".format(distance=data['distance'])
+    if data['gender']:
+        where = where + " and gender <= '{gender}'".format(gender=data['gender'])
     order_by = ""
     if data['tab'] == 'fresh':
         order_by = "created_at desc"

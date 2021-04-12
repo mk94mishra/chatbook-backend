@@ -6,6 +6,7 @@ class Feed(BaseModel):
     type: str
     tab: str
     distance:  Optional[int] = None 
+    gender:  Optional[str] = None 
 
     descripton: Optional[str] = None
     category_id: Optional[int] = None

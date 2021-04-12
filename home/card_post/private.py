@@ -39,7 +39,7 @@ async def card_post_all(request:Request,payload: Feed):
     if data['tab'] == 'most-liked':
         order_by = "count_like desc"
     if data['tab'] == 'trending':
-        where = where + " and ageing <= 1"
+        where = where + " and p.ageing <= 1"
         order_by = "count_like desc"
     
     if data['type'] == 'home':

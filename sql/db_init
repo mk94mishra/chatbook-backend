@@ -1,14 +1,16 @@
-1. tbl_option
+1. create extension postgis;
+
+2. tbl_option
 ALTER TABLE tbl_option  
    ADD CONSTRAINT check_types 
    CHECK ("type" IN ('community','category','designation') )
 
-2. tbl_action
+3. tbl_action
 ALTER TABLE tbl_action  
    ADD CONSTRAINT check_types 
-   CHECK ("type" IN ('like','comment','bookmark','spam','block','rating') )
+   CHECK ("type" IN ('like','comment','comment-like','bookmark','spam','block','rating') )
 
-3. order by
+4. order by
 
 insert into tbl_orderby (type, name_frontend,name_backend)
 values ('home','Latest','p.created_at desc' ),

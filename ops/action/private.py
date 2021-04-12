@@ -27,7 +27,7 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
         if (not data['post_id']):
             return error_response(code=400, message="must be set post_id!")
     if action_type == 'comment':
-        if (not data['post_id']) & (not data['description']) & (not data['media_url']):
+        if (not data['post_id']) & ((not data['description']) or (not data['media_url'])):
             return error_response(code=400, message="must be set post_id, description or media!")
     if action_type == 'bookmark':
         if (not data['post_id']):

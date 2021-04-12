@@ -25,11 +25,11 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
 
     if action_type == 'like':
         pass
-    if action_type == 'bookmark':
-        pass
     if action_type == 'comment':
         if (not data['description']) & (not data['media_url']):
             return error_response(code=400, message="must be set description or media!")
+    if action_type == 'bookmark':
+        pass
     if action_type == 'spam':
         if not data['description']:
             return error_response(code=400, message="must be fill description!")

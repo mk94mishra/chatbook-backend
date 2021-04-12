@@ -13,7 +13,7 @@ router = APIRouter(prefix='/v1/private/card-comment', tags=["private-card-commen
 
 # get card-comment all
 @router.get("/post/{post_id}", status_code=status.HTTP_200_OK)
-async def card_comment_all(request:Request,post_id:int,limit: Optional[int] = 10, offset: Optional[int] = 0):
+async def card_comment_post(request:Request,post_id:int,limit: Optional[int] = 10, offset: Optional[int] = 0):
     
     sql = "select * from tbl_card_comment"
     where = " where post_id={post_id}".format(post_id=post_id)

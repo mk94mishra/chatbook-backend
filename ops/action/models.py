@@ -6,8 +6,8 @@ class Action(Model):
     type = CharField(max_length=100)
 
     user = ForeignKeyField('models.User')
-    post = ForeignKeyField('models.Post')
-    
+    post = ForeignKeyField('models.Post', null=True)
+    comment_id = IntField(null=True)
     description = CharField(max_length=500, null=True)
     media_url = CharField(max_length=500, null=True)
 
@@ -20,7 +20,7 @@ class Action(Model):
 
     class Meta:
         table = "tbl_action"
-        unique_together = (("user", "post","type"),("user","user_id_blocked"),("user","user_id_rated") )
+        unique_together = (("user", "post","type"),("user","comment_id"),("user","user_id_blocked"),("user","user_id_rated") )
 
 
       

@@ -42,7 +42,7 @@ async def post_create(request: Request, payload: PostCreate):
         'url': data['media_url'],
         'thumbnail_url': data['thumbnail_url']
     }
-    ok, err = media_validation(data['media'])
+    ok, err = media_validation(**data['media'])
     if err:
         return error_response(code=400, message=err)
 

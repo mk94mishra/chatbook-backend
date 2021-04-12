@@ -11,10 +11,10 @@ def card_post_private(**data):
         ac as (select array_agg(id) as id, post_id, max(created_at) as created_at from tbl_action where type='comment' and user_id={logged_in_user} group by post_id),
         abo as (select id,post_id ,created_at from tbl_action where type='bookmark' and user_id={logged_in_user}),
         asp as (select id,post_id ,created_at from tbl_action where type='spam' and user_id={logged_in_user}),
-        ar as (select id,user_id_rated, rating,created_at from tbl_action where type='rating' and user_id={logged_in_user}),
+        ar as (select id,user_id_rated_id, rating,created_at from tbl_action where type='rating' and user_id={logged_in_user}),
         ab1 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id={logged_in_user}),
-        ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user})
-        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where user_id={logged_in_user} and is_activated isnull group by receiver_id)
+        ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user}),
+        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user} and is_activated isnull group by receiver_id)
 
         select 
         p.*,
@@ -32,7 +32,7 @@ def card_post_private(**data):
         left join ac on p.id=ac.post_id
         left join abo on p.id=abo.post_id
         left join asp on p.id=asp.post_id
-        left join ar on p.user_id=ar.user_id_rated
+        left join ar on p.user_id=ar.user_id_rated_id
         left join ab1 on p.user_id=ab1.user_id_blocked_id
         left join ab2 on p.user_id=ab2.user_id
         left join cr on p.user_id=cr.receiver_id
@@ -72,13 +72,13 @@ def card_post_private_response(data):
             "count_like":card_single['count_like'],
             "count_comment":card_single['count_comment'],
 
-            "action_like_id":card_single['action_id_like'],
-            "action_like_created_at":card_single['created_at_like'],
+            "action_like_id":card_single['action_like_id'],
+            "action_like_created_at":card_single['action_like_created_at'],
             "action_comment_id":card_single['action_comment_id'],
             "action_comment_created_at":card_single['action_comment_created_at'],
             "action_bookmark_id":card_single['action_bookmark_id'],
             "action_bookmark_created_at":card_single['action_bookmark_created_at'],
-            "action_spam_id":card_single['action_id_spam'],
+            "action_spam_id":card_single['action_spam_id'],
             "action_spam_created_at":card_single['action_spam_created_at'],
             "action_rating_id":card_single['action_rating_id'],
             "action_rating_created_at":card_single['action_rating_created_at'],
@@ -127,10 +127,10 @@ def card_comment_private(**data):
     sql = """
         with
         acl as (select id,comment_id,created_at from tbl_action where type='comment-like' and user_id={logged_in_user}),
-        ar as (select id,user_id_rated, rating,created_at from tbl_action where type='rating' and user_id={logged_in_user}),
+        ar as (select id,user_id_rated_id, rating,created_at from tbl_action where type='rating' and user_id={logged_in_user}),
         ab1 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id={logged_in_user}),
-        ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user})
-        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where user_id={logged_in_user} and is_activated isnull group by receiver_id)
+        ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user}),
+        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user} and is_activated isnull group by receiver_id)
 
         select 
         c.*,
@@ -138,11 +138,10 @@ def card_comment_private(**data):
         ar.id as action_rating_id, ar.rating as action_rated, ar.created_at as action_rating_created_at,
         ab1.id as action_id_block,
         ab2.id as action_id_block_me,
-        st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) as distance,
         cr.count_pending_request
         from tbl_card_comment as c
         left join acl on c.id=acl.comment_id
-        left join ar on c.user_id=ar.user_id_rated
+        left join ar on c.user_id=ar.user_id_rated_id
         left join ab1 on c.user_id=ab1.user_id_blocked_id
         left join ab2 on c.user_id=ab2.user_id
         left join cr on c.user_id=cr.receiver_id

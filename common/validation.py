@@ -2,9 +2,9 @@ import re
 import datetime
 	
 def media_validation(**media) -> (bool, str):
-    if (not media['url']) & (not media['type']) (not media['thumbnail_url']):
-        return True, None
-
+    if (not media['url']) & (not media['type']) & (not media['thumbnail_url']):
+        return True,None
+    
     if media['url']:
         if not media['type']:
             return False, {"msg": "must be set media type!"}

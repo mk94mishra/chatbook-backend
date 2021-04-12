@@ -77,7 +77,7 @@ async def card_post_all(request:Request,payload: Feed):
 
 # get card-post user
 @router.get("/type/{type_name}", status_code=status.HTTP_200_OK)
-async def card_post_user(request:Request,type_name:str,limit:Optional[int] = 10, offset:Optional[int] = 0):
+async def card_post_user_type(request:Request,type_name:str,limit:Optional[int] = 10, offset:Optional[int] = 0):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     user_data = {
@@ -90,19 +90,19 @@ async def card_post_user(request:Request,type_name:str,limit:Optional[int] = 10,
 
     if type_name == 'my-post':
         where = " and p.user_id={logged_in_user}".format(logged_in_user=logged_in_user)
-        orderby = " created_at desc"
+        orderby = " p.created_at desc"
 
     if type_name == 'my-bookmark':
-        where = " and ab.id notnull"
-        orderby = " created_at_bookmark desc"
+        where = " and abo.id notnull"
+        orderby = " abo.created_at desc"
     
     if type_name == 'my-like':
         where = " and al.id notnull"
-        orderby = " created_at_like desc"
+        orderby = " al.created_at desc"
     
     if type_name == 'my-comment-post':
         where = " and ac.id notnull"
-        orderby = " created_at_comment desc"
+        orderby = " ac.created_at desc"
 
     orderby = " order by {orderby} nulls last limit {limit} offset {offset}".format(orderby=orderby,limit=limit,offset=offset)
 

@@ -4,23 +4,29 @@ from tortoise.fields import ForeignKeyField, CharField, DatetimeField,IntField, 
 
 class Action(Model):
     type = CharField(max_length=100)
-
     user = ForeignKeyField('models.User')
+
+    # like, bookmark,spam,comment
     post = ForeignKeyField('models.Post', null=True)
+
+    # comment & spam
+    desription = CharField(max_length=500, default=1, null=True)
+    # comment
+    media_url = CharField(max_length=500, default=1, null=True)
+    # comment - like
     comment_id = IntField(null=True)
-    description = CharField(max_length=500, null=True)
-    media_url = CharField(max_length=500, null=True)
 
+    # user block
     user_id_blocked = ForeignKeyField('models.User', related_name='blocked_user', null=True)
+    # user rated
     user_id_rated = ForeignKeyField('models.User', related_name='rating_receiver', null=True)
-
     rating = FloatField(default=0, null=True)
 
     created_at = DatetimeField(auto_now_add=True)
 
     class Meta:
         table = "tbl_action"
-        unique_together = (("user", "post","type"),("user","comment_id"),("user","user_id_blocked"),("user","user_id_rated") )
+        unique_together = (("user", "post", "desription", "media_url","type"),("user","comment_id"),("user","user_id_blocked"),("user","user_id_rated") )
 
 
       

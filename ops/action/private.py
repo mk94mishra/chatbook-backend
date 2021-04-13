@@ -23,8 +23,8 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
         return error_response(code=400, message="you don't have permision!")
 
     data['type'] = action_type
-
-    if action_type == 'like':
+    print(data)
+    if action_type == 'like':  
         if (not data['post_id']):
             return error_response(code=400, message="must be set post_id!")
     if action_type == 'comment':
@@ -52,8 +52,13 @@ async def action_post_create(request: Request, action_type:str, payload: ActionC
             return success_response(data)
         except DoesNotExist:
             return error_response(code=400, message="something error!")
+    
+    if action_type == 'like' or action_type == 'bookmark':
+        data['description'] = 1
+        data['media_url'] = 1
 
     data = {k: v for k, v in data.items() if v is not None}
+    print(data)
     action = await Action.create(**data)
 
     # insert avg rating into tbl_user

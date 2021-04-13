@@ -10,9 +10,9 @@ class Action(Model):
     post = ForeignKeyField('models.Post', null=True)
 
     # comment & spam
-    desription = CharField(max_length=500, default=1, null=True)
+    description = CharField(max_length=500, default=1,null=True)
     # comment
-    media_url = CharField(max_length=500, default=1, null=True)
+    media_url = CharField(max_length=500, default=1,null=True)
     # comment - like
     comment_id = IntField(null=True)
 
@@ -26,7 +26,7 @@ class Action(Model):
 
     class Meta:
         table = "tbl_action"
-        unique_together = (("user", "post", "desription", "media_url","type"),("user","comment_id"),("user","user_id_blocked"),("user","user_id_rated") )
+        unique_together = (("user", "post", "description", "media_url","type"),("user","comment_id"),("user","user_id_blocked"),("user","user_id_rated") )
 
 
       

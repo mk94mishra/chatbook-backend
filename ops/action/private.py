@@ -77,6 +77,12 @@ async def action_delete(request: Request,action_id:int):
     return success_response({"msg":"action deleted!"})
 
 
+# get comment action
+@router.get("/{action_id}/comment", status_code=status.HTTP_200_OK)
+async def action_get(request: Request,action_id:int):
+    return success_response(await Action.get(id=action_id))
+
+
 # get block 
 @router.get("/block-list", status_code=status.HTTP_200_OK)
 async def user_block_list(request: Request, limit: Optional[int] = 10, offset: Optional[int] = 0):

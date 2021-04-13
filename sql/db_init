@@ -1,11 +1,13 @@
 1. create extension postgis;
 
 2. tbl_option
+
 ALTER TABLE tbl_option  
    ADD CONSTRAINT check_types 
    CHECK ("type" IN ('community','category','designation') )
 
 3. tbl_action
+
 ALTER TABLE tbl_action  
    ADD CONSTRAINT check_types 
    CHECK ("type" IN ('like','comment','comment-like','bookmark','spam','block','rating') )

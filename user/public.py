@@ -73,7 +73,7 @@ async def user_otp_verify(request: Request, payload: UserOtpVerify):
             }
             # check community & user type
             if (not user.community_id) or (not user.designation_id) or (not user.gender):
-                return success_response({"token": token_create(claims),"user_id": user.id, "next": "user put - community_id, designation_id, gender"})  
+                return success_response({"token": token_create(claims),"user_id": user.id, "next": "update-profile"})  
             # create token and send user to update profile
             return success_response({"token": token_create(claims),"user_id": user.id, "next": "home"})
         return error_response(code=403, message="otp not verified!")
@@ -106,7 +106,7 @@ async def user_login_password(request: Request, payload: UserLoginPassword):
         }
         # check community & user type
         if (not user.community_id) or (not user.designation_id) or (not user.gender):
-            return success_response({"token": token_create(claims),"user_id": user.id, "next": "user put - community_id, designation_id, gender"})
+            return success_response({"token": token_create(claims),"user_id": user.id, "next": "update-profile"})
         return success_response({"token": token_create(claims), "user_id": user.id, "next": "home"})
 
     # when phone number not exist

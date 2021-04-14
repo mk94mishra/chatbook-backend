@@ -120,7 +120,7 @@ async def card_post_user_type(request:Request,type_name:str,limit:Optional[int] 
 
 # get card-post single
 @router.get("/post/{post_id}", status_code=status.HTTP_200_OK)
-async def card_post_single(request:Request,post_id:str):
+async def card_post_single(request:Request,post_id:int):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     user_data = {
@@ -132,6 +132,28 @@ async def card_post_single(request:Request,post_id:str):
     where = " and p.id={post_id}".format(post_id=post_id)
     sql = sql + where 
     print(sql)
+    try:
+        async with in_transaction() as connection:
+            card_post = await connection.execute_query(sql)
+            return success_response(card_post_private_response(card_post[1]))
+    except OperationalError:
+        return error_response(code=400, message="something error!")
+
+
+
+# get card-post single user
+@router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
+async def card_post_single(request:Request,user_id:int):
+    logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    user_data = {
+        "logged_in_user":logged_in_user,
+        "logged_in_lat" :user.lat,
+        "logged_in_long" :user.long
+    }
+    sql = card_post_private(**user_data)
+    where = " and p.user_id={user_id}".format(user_id=post_id)
+    sql = sql + where 
     try:
         async with in_transaction() as connection:
             card_post = await connection.execute_query(sql)

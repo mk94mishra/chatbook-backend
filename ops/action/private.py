@@ -88,12 +88,12 @@ async def action_get(request: Request,action_id:int):
 async def user_block_list(request: Request, limit: Optional[int] = 10, offset: Optional[int] = 0):
     # self user check
     logged_user_id = int(request.state.user_id)
-
+    print("user_id")
     try:
         async with in_transaction() as connection:
             sql = """
             with 
-            ab as (select id, created_at,user_id_blocked_id, from tbl_action where user_id={logged_user_id} and type='block')
+            ab as (select id, created_at,user_id_blocked_id from tbl_action where user_id={logged_user_id} and type='block')
 
             select
             ab.id as action_block_id, ab.user_id_blocked_id, ab.created_at as action_block_created_at,

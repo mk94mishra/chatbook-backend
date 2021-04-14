@@ -66,10 +66,10 @@ async def chat_request_pending(request: Request, user_id: int):
         async with in_transaction() as connection:
             sql = """
             with 
-            cr as (select id, created_at,sender_id from tbl_chat_request where receiver_id={user_id} and is_activated isnull)
+            cr as (select id, msg, created_at,sender_id from tbl_chat_request where receiver_id={user_id} and is_activated isnull)
 
             select
-            cr.id , cr.sender_id , cr.created_at,
+            cr.id , cr.msg, cr.sender_id , cr.created_at,
             u.username,u.profile_pic_url
             from cr
             left join tbl_user as u on cr.sender_id=u.id

@@ -125,7 +125,6 @@ async def user_delete(request: Request, user_id:int, payload: UserDelete):
     
     
 
-
 # phone otp send
 @router.post("/phone-update/otp-send", status_code=status.HTTP_201_CREATED)
 async def user_phone_otp_send(request: Request, payload: UserPhoneOtpSend):

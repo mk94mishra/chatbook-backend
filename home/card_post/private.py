@@ -52,7 +52,7 @@ async def card_post_all(request:Request,payload: Feed):
     if data['type'] == 'search':
         if not data['description']:
             return error_response(code=400, message="must be set search text!")
-        where = where + " and description like %{description}%".format(description=data['description'])
+        where = where + " and description like '%{description}%'".format(description=data['description'])
 
     if data['type'] == 'category':
         if not data['category_id']:
@@ -143,7 +143,7 @@ async def card_post_single(request:Request,post_id:int):
 
 # get card-post single user
 @router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
-async def card_post_single(request:Request,user_id:int):
+async def card_post_user(request:Request,user_id:int):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     user_data = {

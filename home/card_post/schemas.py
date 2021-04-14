@@ -8,7 +8,7 @@ class Feed(BaseModel):
     distance:  Optional[int] = None 
     gender:  Optional[str] = None 
 
-    descripton: Optional[str] = None
+    description: Optional[str] = None
     category_id: Optional[int] = None
     designation_id: Optional[int] = None
 

@@ -152,8 +152,9 @@ async def card_post_user(request:Request,user_id:int):
         "logged_in_long" :user.long
     }
     sql = card_post_private(**user_data)
-    where = " and p.user_id={user_id}".format(user_id=post_id)
+    where = " and p.user_id={user_id}".format(user_id=user_id)
     sql = sql + where 
+    print(sql)
     try:
         async with in_transaction() as connection:
             card_post = await connection.execute_query(sql)

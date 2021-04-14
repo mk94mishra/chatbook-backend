@@ -33,9 +33,24 @@ async def card_post_all(request:Request,limit: Optional[int] = 10, offset: Optio
 
 # get card-post single
 @router.get("/post/{post_id}", status_code=status.HTTP_200_OK)
-async def card_post_single(request:Request,post_id: str):
+async def card_post_single(request:Request,post_id: int):
     sql = "select * from tbl_card_post"
     where = " where id = {post_id}".format(post_id=post_id)
+    
+    sql = sql + where
+    try:
+        async with in_transaction() as connection:
+            card_post = await connection.execute_query(sql)
+            return success_response(card_post_public_response(card_post[1]))
+    except OperationalError:
+        return error_response(code=400, message="something error!")
+
+
+# get card-post single user
+@router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
+async def card_post_single(request:Request,user_id: int):
+    sql = "select * from tbl_card_post"
+    where = " where user_id = {user_id}".format(user_id=user_id)
     
     sql = sql + where
     try:

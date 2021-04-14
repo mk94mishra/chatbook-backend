@@ -119,3 +119,28 @@ async def user_login_password(request: Request, payload: UserLoginPassword):
 async def user_check(request: Request, user_id:int):
     user = await User.get(id=user_id)
     return success_response({"is_active":user.is_active})
+
+
+# get user
+@router.get("/{user_id}", status_code=status.HTTP_200_OK)
+async def user_read(request: Request, user_id:int):
+    # self user check
+    if user_id != int(request.state.user_id):
+        return error_response(code=401, message="you don't have permission!")
+
+    try:
+        async with in_transaction() as connection:
+            sql = """select id, username,
+                profile_pic_url,gender,rating
+                from tbl_user
+                """
+
+            filter = " where is_active = 'true' and id={user_id}".format(user_id=user_id)
+            sql = sql + filter
+
+            user = await connection.execute_query(sql)
+         
+            return success_response(user[1])
+    except OperationalError:
+        return error_response(code=400, message="something error!")
+

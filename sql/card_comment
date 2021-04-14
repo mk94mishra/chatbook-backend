@@ -1,15 +1,2 @@
-1. tbl_card_comment
-create or replace view tbl_card_comment as (
-    with 
-    ac as (select id, post_id, user_id, description, media_url, created_at from tbl_action where type='comment'),
-    acl as (select count(id) as count_comment_like, comment_id from tbl_action where type='comment-like' group by comment_id)
-    
-    select 
-    ac.*,
-    u.username, u.profile_pic_url, u.rating,
-    acl.count_comment_like
-    from ac 
-    left join tbl_user as u on ac.user_id=u.id
-    left join acl on ac.id=acl.comment_id
 
 )

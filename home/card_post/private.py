@@ -31,7 +31,9 @@ async def card_post_all(request:Request,payload: Feed):
         "logged_in_long":logged_in_long
     }
     sql = card_post_private(**user_data)
-    where = " and community_id={logged_in_community_id}".format(logged_in_community_id=logged_in_community_id)
+    #where = " and community_id={logged_in_community_id}".format(logged_in_community_id=logged_in_community_id)
+
+    where = ""
 
     if data['distance']:
         where = where + " and st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) <= {distance}".format(logged_in_lat=logged_in_lat,logged_in_long=logged_in_long,distance=data['distance'])

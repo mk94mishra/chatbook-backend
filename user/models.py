@@ -24,3 +24,7 @@ class User(AbstractBaseModel):
     class Meta:
         table = "tbl_user"
 
+
+
+
+

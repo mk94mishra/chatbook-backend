@@ -36,23 +36,7 @@ async def card_comment_all(request:Request,post_id: int, limit: Optional[int]=10
     except OperationalError:
         return error_response(code=400, message="something error!")
 
-
-
-from copy import deepcopy
-from typing import Optional
-from fastapi import APIRouter, Request, status, HTTPException, Depends
-from tortoise.transactions import in_transaction
-from tortoise.exceptions import DoesNotExist, OperationalError
-import json
-from common.response import error_response, success_response
-
-from user.models import User
-
-from admin.helper.helper import card_comment_private
-
-router = APIRouter(prefix='/v1/private/card-comment', tags=["private-card-comment"])
-
-
+        
 # get card-comment user
 @router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
 async def card_comment_user(request:Request,user_id: int, limit: Optional[int]=10, offset: Optional[int]=0):

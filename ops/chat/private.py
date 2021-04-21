@@ -238,7 +238,7 @@ async def chat_user_inbox(request: Request, user_id:int, limit: Optional[int] = 
             ci as (select user_id_max as user_id, profile_pic_url_max as profile_pic_url, name_max as name, last_msg, is_seen_min as is_seen, created_at from tbl_chat_group where user_id_min={user_id} and is_deleted_min=False union select user_id_min as user_id,profile_pic_url_min as profile_pic_url, name_min as name, last_msg, is_seen_max as is_seen, created_at from tbl_chat_group where user_id_max={user_id} and is_deleted_max=False)
             
             select
-            c.*,
+            ci.*,
             u.rating
             from tbl_user as u
             left join ci on u.id=ci.user_id""".format(user_id=user_id)

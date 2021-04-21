@@ -241,7 +241,7 @@ async def chat_user_inbox(request: Request, user_id:int, limit: Optional[int] = 
             ci.*,
             u.rating
             from tbl_user as u
-            left join ci on u.id=ci.user_id""".format(user_id=user_id)
+            right join ci on u.id=ci.user_id""".format(user_id=user_id)
 
             orderby = " order by ci.is_seen desc limit {limit} offset {offset}".format(limit=limit,offset=offset)
 

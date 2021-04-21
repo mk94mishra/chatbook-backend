@@ -15,7 +15,7 @@ router = APIRouter(prefix='/v1/private/action', tags=["action"])
 
 # create action
 @router.post("/type/{action_type}", status_code=status.HTTP_201_CREATED)
-async def action_post_create(request: Request, action_type:str, payload: ActionCreate):
+async def action_create(request: Request, action_type:str, payload: ActionCreate):
     data = deepcopy(payload.dict())
 
     # self user check

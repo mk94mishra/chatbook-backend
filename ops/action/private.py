@@ -10,7 +10,7 @@ from admin.helper.helper import update_avg_rating
 from ops.action.models import Action
 from ops.action.schemas import ActionCreate
 
-router = APIRouter(prefix='/v1/private/action', tags=["action"])
+router = APIRouter(prefix='/v1/public/action', tags=["action"])
 
 
 # create action
@@ -18,52 +18,54 @@ router = APIRouter(prefix='/v1/private/action', tags=["action"])
 async def action_create(request: Request, action_type:str, payload: ActionCreate):
     data = deepcopy(payload.dict())
 
-    # self user check
+    """ # self user check
     if int(data['user_id']) != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
+        return error_response(code=400, message="you don't have permision!")"""
 
     data['type'] = action_type
-    print(data)
-    if action_type == 'like':  
+    if (action_type == 'like') or (action_type == 'bookmark') :  
         if (not data['post_id']):
             return error_response(code=400, message="must be set post_id!")
+        data['data'] = {"post_id":data['post_id']}
+        
     if action_type == 'comment':
         if (not data['post_id']) & ((not data['description']) or (not data['media_url'])):
             return error_response(code=400, message="must be set post_id, description or media!")
+        data['data'] = {"post_id":data['post_id'], "description":data['description'], "media_url":data['media_url']}
+
     if action_type == 'comment-like':
         if (not data['comment_id']):
             return error_response(code=400, message="must be set comment_id!")
-    if action_type == 'bookmark':
-        if (not data['post_id']):
-            return error_response(code=400, message="must be set post_id!")
+        data['data'] = {"comment_id":data['comment_id']}
+
     if action_type == 'spam':
         if (not data['post_id']) & (not data['description']):
             return error_response(code=400, message="must be set post_id & description!")
+        data['data'] = {"post_id":data['post_id'],"description":data['description']}
+
     if action_type == 'block':
         if not data['user_id_blocked_id']:
             return error_response(code=400, message="must be fill user_id_blocked!")
+        data['data'] = {"user_id_blocked_id":data['user_id_blocked_id']}
+
     if action_type == 'rating':
         if (not data['user_id_rated_id']) & (not data['rating']):
             return error_response(code=400, message="must be fill user_id_rated & rating!")
+        data['data'] = {"user_id_rated_id":data['user_id_rated_id'],"rating":data['rating']}
+        # ---------------------------------------
         try:
-            rating_exist = await Action.get(user_id=data['user_id'],user_id_rated_id=data['user_id_rated_id'])
-            await Action(id=rating_exist.id, **data).save(update_fields=data.keys())
-            update_avg_rating(data['user_id_rated_id'])
-            return success_response(data)
+            async with in_transaction() as connection:
+                sql = "delete from tbl_action where user_id={user_id} and (data->'user_id_rated_id')::int={user_id_rated_id}".format(rating=data['rating'],user_id=data['user_id'],user_id_rated_id=data['user_id_rated_id'])
+                await connection.execute_query(sql)
         except DoesNotExist:
             return error_response(code=400, message="something error!")
-    
-    if action_type == 'like' or action_type == 'bookmark':
-        data['description'] = 1
-        data['media_url'] = 1
-
+        # -----------------------------------------
     data = {k: v for k, v in data.items() if v is not None}
-    print(data)
     action = await Action.create(**data)
 
     # insert avg rating into tbl_user
     if action_type == 'rating':
-        update_avg_rating(data['user_id_rated_id'])
+        await update_avg_rating(data['user_id_rated_id'])
 
     return success_response(action)
 
@@ -93,7 +95,7 @@ async def user_block_list(request: Request, limit: Optional[int] = 10, offset: O
         async with in_transaction() as connection:
             sql = """
             with 
-            ab as (select id, created_at,user_id_blocked_id from tbl_action where user_id={logged_user_id} and type='block')
+            ab as (select id, created_at, data->'user_id_blocked_id' as user_id_blocked_id from tbl_action where user_id={logged_user_id} and type='block')
 
             select
             ab.id as action_block_id, ab.user_id_blocked_id, ab.created_at as action_block_created_at,

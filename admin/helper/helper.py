@@ -152,13 +152,14 @@ def card_comment_private(**data):
     
     return sql
     
-def update_avg_rating(user_id):
+async def update_avg_rating(user_id):
     try:
-        with in_transaction() as connection:
-            sql = """update tbl_user set rating=r.rating
-            from (select avg(rating) as rating from tbl_action where user_id_rated_id={user_id} and type='rating') as r
+        async with in_transaction() as connection:
+            sql = """
+            update tbl_user set rating=r.rating
+            from (select avg((data->'rating')::float) as rating from tbl_action where (data->'user_id_rated_id')::int={user_id} and type='rating') as r
             where id = {user_id}
             """.format(user_id =user_id)
-            connection.execute_query(sql)
+            await connection.execute_query(sql)
     except OperationalError:
         return error_response(code=400, message="something error!")

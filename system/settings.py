@@ -12,14 +12,12 @@ class Settings:
     # register models
     models_path = [
         'user.models',
-        'ops.chat.models',
-        'ops.action.models',
+        'atom.chat.models',
+        'atom.action.models',
         #admin
-        'admin.option.models',
-        'admin.faq.models',
-        'admin.official.models',
+        'atom.option.models',
         # post
-        'home.post.models'
+        'atom.home.post.models'
         ]
 
     SERVICE_NAME = _config.get("SERVICE_NAME", cast=str, default="chatbook-backend")

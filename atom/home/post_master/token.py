@@ -81,7 +81,7 @@ async def card_post_all(request:Request,payload: Feed):
 
 # get card-post user
 @router.get("/type/{type_name}", status_code=status.HTTP_200_OK)
-async def card_post_user_type(request:Request,type_name:str,limit:Optional[int] = 10, offset:Optional[int] = 0):
+async def post_master_user_type(request:Request,type_name:str,limit:Optional[int] = 10, offset:Optional[int] = 0):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     user_data = {
@@ -122,7 +122,7 @@ async def card_post_user_type(request:Request,type_name:str,limit:Optional[int] 
 
 # get card-post single
 @router.get("/post/{post_id}", status_code=status.HTTP_200_OK)
-async def card_post_single(request:Request,post_id:int):
+async def post_master_single(request:Request,post_id:int):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     user_data = {
@@ -145,7 +145,7 @@ async def card_post_single(request:Request,post_id:int):
 
 # get card-post single user
 @router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
-async def card_post_user(request:Request,user_id:int):
+async def post_master_user(request:Request,user_id:int):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     user_data = {

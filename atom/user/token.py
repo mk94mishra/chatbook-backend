@@ -11,8 +11,8 @@ from common.validation import form_validation
 from common.response import error_response, success_response
 from common.otp import generate_and_send_otp, verify_generated_otp
 
-from user.models import User
-from user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword, UserPhoneOtpVerify, UserPhoneOtpSend,UserDelete
+from atom.user.models import User
+from atom.user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword, UserPhoneOtpVerify, UserPhoneOtpSend,UserDelete
 
 router = APIRouter(prefix='/v1/private/user', tags=["user"])
 

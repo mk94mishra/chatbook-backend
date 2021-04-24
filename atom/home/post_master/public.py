@@ -6,7 +6,7 @@ from tortoise.exceptions import DoesNotExist, OperationalError
 import json
 from common.response import error_response, success_response
 
-from user.models import User
+from atom.user.models import User
 
 from atom.home.card_post.schemas import Feed
 from atom.helper.helper import card_post_public_response

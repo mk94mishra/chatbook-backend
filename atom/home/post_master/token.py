@@ -6,12 +6,12 @@ from tortoise.exceptions import DoesNotExist, OperationalError
 import json
 from common.response import error_response, success_response
 
-from user.models import User
+from atom.user.models import User
 
-from atom.home.card_post.schemas import Feed
-from atom.helper.helper import card_post_private, card_post_private_response
+from atom.home.post_master.schemas import Feed
+from atom.helper.helper import post_master_token, post_master_token_response
 
-router = APIRouter(prefix='/v1/private/card-post', tags=["private-card-post"])
+router = APIRouter(prefix='/v1/private/post-master', tags=["private-post-master"])
 
 
 # get card-post all
@@ -30,7 +30,7 @@ async def card_post_all(request:Request,payload: Feed):
         "logged_in_lat":logged_in_lat,
         "logged_in_long":logged_in_long
     }
-    sql = card_post_private(**user_data)
+    sql = post_master_token(**user_data)
     #where = " and community_id={logged_in_community_id}".format(logged_in_community_id=logged_in_community_id)
 
     where = ""
@@ -73,7 +73,7 @@ async def card_post_all(request:Request,payload: Feed):
     try:
         async with in_transaction() as connection:
             card_post = await connection.execute_query(sql)
-            return success_response(card_post_private_response(card_post[1]))
+            return success_response(post_master_token_response(card_post[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
 
@@ -90,7 +90,7 @@ async def card_post_user_type(request:Request,type_name:str,limit:Optional[int] 
         "logged_in_long" :user.long
     }
 
-    sql = card_post_private(**user_data)
+    sql = post_master_token(**user_data)
 
     if type_name == 'my-post':
         where = " and p.user_id={logged_in_user}".format(logged_in_user=logged_in_user)
@@ -115,7 +115,7 @@ async def card_post_user_type(request:Request,type_name:str,limit:Optional[int] 
     try:
         async with in_transaction() as connection:
             card_post = await connection.execute_query(sql)
-            return success_response(card_post_private_response(card_post[1]))
+            return success_response(post_master_token_response(card_post[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
 
@@ -130,14 +130,14 @@ async def card_post_single(request:Request,post_id:int):
         "logged_in_lat" :user.lat,
         "logged_in_long" :user.long
     }
-    sql = card_post_private(**user_data)
+    sql = post_master_token(**user_data)
     where = " and p.id={post_id}".format(post_id=post_id)
     sql = sql + where 
     print(sql)
     try:
         async with in_transaction() as connection:
             card_post = await connection.execute_query(sql)
-            return success_response(card_post_private_response(card_post[1]))
+            return success_response(post_master_token_response(card_post[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
 
@@ -153,14 +153,14 @@ async def card_post_user(request:Request,user_id:int):
         "logged_in_lat" :user.lat,
         "logged_in_long" :user.long
     }
-    sql = card_post_private(**user_data)
+    sql = post_master_token(**user_data)
     where = " and p.user_id={user_id}".format(user_id=user_id)
     sql = sql + where 
     print(sql)
     try:
         async with in_transaction() as connection:
             card_post = await connection.execute_query(sql)
-            return success_response(card_post_private_response(card_post[1]))
+            return success_response(post_master_token_response(card_post[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
 

@@ -4,7 +4,7 @@ from tortoise.transactions import in_transaction
 
 from common.response import error_response, success_response
 
-def card_post_private(**data):
+def post_master_token(**data):
     sql = """
         with
         al as (select id,post_id,created_at from tbl_action where type='like' and user_id={logged_in_user}),
@@ -27,7 +27,7 @@ def card_post_private(**data):
         ab2.id as action_id_block_me,
         st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) as distance,
         cr.count_pending_request
-        from tbl_card_post as p
+        from tbl_post_master as p
         left join al on p.id=al.post_id
         left join ac on p.id=ac.post_id
         left join abo on p.id=abo.post_id
@@ -44,7 +44,7 @@ def card_post_private(**data):
     return sql
 
 
-def card_post_private_response(data):
+def post_master_token_response(data):
     card_post_list = list()
     for card_single in data:
         media_data = None
@@ -91,7 +91,7 @@ def card_post_private_response(data):
     return card_post_list
 
 
-def card_post_public_response(data):
+def post_master_public_response(data):
     card_post_list = list()
     for card_single in data:
         media_data = None
@@ -123,7 +123,7 @@ def card_post_public_response(data):
 
     return card_post_list
 
-def card_comment_private(**data):
+def comment_master_token(**data):
     sql = """
         with
         acl as (select id,comment_id,created_at from tbl_action where type='comment-like' and user_id={logged_in_user}),

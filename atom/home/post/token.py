@@ -10,7 +10,7 @@ from common.response import error_response, success_response
 from atom.home.post.models import Post
 from atom.home.post.schemas import PostCreate
 
-from user.models import User
+from atom.user.models import User
 
 
 router = APIRouter(prefix='/v1/private/post', tags=["post"])

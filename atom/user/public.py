@@ -13,8 +13,8 @@ from common.otp import generate_and_send_otp, verify_generated_otp
 
 from common.validation import form_validation
 
-from user.models import User
-from user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword
+from atom.user.models import User
+from atom.user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword
 
 
 
@@ -22,7 +22,7 @@ router = APIRouter(prefix='/v1/public/user', tags=["public-user"])
 
 
 # enter user
-@router.post("/otp-send", status_code=status.HTTP_201_CREATED)
+@router.post("/login-phone-otp/send-otp", status_code=status.HTTP_201_CREATED)
 async def user_otp_send(request: Request, payload: UserOtpSend):
     data = deepcopy(payload.dict())
     data = {k: v for k, v in payload.dict().items() if v is not None}
@@ -49,7 +49,7 @@ async def user_otp_send(request: Request, payload: UserOtpSend):
 
         
 # otp verify
-@router.post("/otp-verify", status_code=status.HTTP_200_OK)
+@router.post("/login-phone-otp/verify-otp", status_code=status.HTTP_200_OK)
 async def user_otp_verify(request: Request, payload: UserOtpVerify):
     data = deepcopy(payload.dict())
     data = {k: v for k, v in payload.dict().items() if v is not None}
@@ -84,7 +84,7 @@ async def user_otp_verify(request: Request, payload: UserOtpVerify):
 
 
 # password login
-@router.post("/login-password", status_code=status.HTTP_200_OK)
+@router.post("/login-phone-password", status_code=status.HTTP_200_OK)
 async def user_login_password(request: Request, payload: UserLoginPassword):
     data = deepcopy(payload.dict())
     data = {k: v for k, v in payload.dict().items() if v is not None}

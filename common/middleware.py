@@ -6,7 +6,7 @@ from fastapi import Header, HTTPException
 from system.settings import settings
 from common.response import error_response
 
-from user.models import User
+from atom.user.models import User
 
 
 class AuthMiddleware(BaseHTTPMiddleware):

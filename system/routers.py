@@ -1,16 +1,16 @@
-from user.private import router as user_private_router
-from user.public import router as user_public_router
-from atom.chat.private import router as chat_private_router
-from atom.action.private import router as action_private_router
+from atom.user.token import router as user_private_router
+from atom.user.public import router as user_public_router
+from atom.chat.token import router as chat_private_router
+from atom.action.token import router as action_private_router
 
-from atom.option.private import router as option_private_router
+from atom.option.token import router as option_private_router
 from atom.option.public import router as option_public_router
 
 # post section import
-from atom.home.post.private import router as post_private_router
-from atom.home.card_post.private import router as card_post_private_router
-from atom.home.card_post.public import router as card_post_public_router
-from atom.home.card_comment.private import router as card_comment_private_router
+from atom.home.post.token import router as post_private_router
+from atom.home.post_master.token import router as post_master_private_router
+from atom.home.post_master.public import router as post_master_public_router
+from atom.home.comment_master.token import router as comment_master_private_router
 
 
 from fastapi import FastAPI
@@ -30,6 +30,6 @@ app.include_router(option_private_router)
 
 # post section
 app.include_router(post_private_router)
-app.include_router(card_post_private_router)
-app.include_router(card_post_public_router)
-app.include_router(card_comment_private_router)
+app.include_router(post_master_private_router)
+app.include_router(post_master_public_router)
+app.include_router(comment_master_private_router)

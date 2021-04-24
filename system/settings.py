@@ -11,7 +11,7 @@ class Settings:
 
     # register models
     models_path = [
-        'user.models',
+        'atom.user.models',
         'atom.chat.models',
         'atom.action.models',
         #admin

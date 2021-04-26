@@ -8,7 +8,7 @@ from common.response import error_response, success_response
 
 from atom.user.models import User
 
-from atom.home.post_master.schemas import Feed
+from atom.feed.post_master.schemas import Feed
 from atom.helper.helper import post_master_token, post_master_token_response
 
 router = APIRouter(prefix='/v1/private/post-master', tags=["private-post-master"])

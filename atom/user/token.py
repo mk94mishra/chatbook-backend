@@ -14,7 +14,7 @@ from common.otp import generate_and_send_otp, verify_generated_otp
 from atom.user.models import User
 from atom.user.schemas import UserOtpSend, UserUpdate, UserOtpVerify, UserLoginPassword, UserPhoneOtpVerify, UserPhoneOtpSend,UserDelete
 
-router = APIRouter(prefix='/v1/private/user', tags=["user"])
+router = APIRouter(prefix='/v1/token/user', tags=["user"])
 
 
 # update user profile

@@ -6,7 +6,7 @@ from common.response import error_response, success_response
 from atom.option.models import Option
 from atom.option.schemas import OptionCreate
 
-router = APIRouter(prefix='/v1/private/option', tags=["public-option"])
+router = APIRouter(prefix='/v1/token/option', tags=["public-option"])
 
 
 # create option

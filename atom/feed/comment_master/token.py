@@ -10,7 +10,7 @@ from atom.user.models import User
 
 from atom.helper.helper import comment_master_token
 
-router = APIRouter(prefix='/v1/private/comment-master', tags=["private-comment-master"])
+router = APIRouter(prefix='/v1/token/feed-comment', tags=["token-feed-comment"])
 
 
 # get card-comment all

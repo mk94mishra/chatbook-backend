@@ -11,7 +11,7 @@ from atom.user.models import User
 from atom.feed.post_master.schemas import Feed
 from atom.helper.helper import post_master_token, post_master_token_response
 
-router = APIRouter(prefix='/v1/private/post-master', tags=["private-post-master"])
+router = APIRouter(prefix='/v1/token/feed-post', tags=["token-feed-post"])
 
 
 # get card-post all
@@ -79,9 +79,9 @@ async def card_post_all(request:Request,payload: Feed):
 
 
 
-# get card-post user
-@router.get("/type/{type_name}", status_code=status.HTTP_200_OK)
-async def post_master_user_type(request:Request,type_name:str,limit:Optional[int] = 10, offset:Optional[int] = 0):
+# get card-post my-post
+@router.get("/my-post", status_code=status.HTTP_200_OK)
+async def post_master_my_post(request:Request,limit:Optional[int] = 10, offset:Optional[int] = 0):
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
     user_data = {
@@ -91,22 +91,89 @@ async def post_master_user_type(request:Request,type_name:str,limit:Optional[int
     }
 
     sql = post_master_token(**user_data)
-
-    if type_name == 'my-post':
-        where = " and p.user_id={logged_in_user}".format(logged_in_user=logged_in_user)
-        orderby = " p.created_at desc"
-
-    if type_name == 'my-bookmark':
-        where = " and abo.id notnull"
-        orderby = " abo.created_at desc"
+    where = " and p.user_id={logged_in_user}".format(logged_in_user=logged_in_user)
+    orderby = " p.created_at desc"
     
-    if type_name == 'my-like':
-        where = " and al.id notnull"
-        orderby = " al.created_at desc"
+    orderby = " order by {orderby} nulls last limit {limit} offset {offset}".format(orderby=orderby,limit=limit,offset=offset)
+
+    sql = sql + where + orderby
+    print(sql)
+    try:
+        async with in_transaction() as connection:
+            card_post = await connection.execute_query(sql)
+            return success_response(post_master_token_response(card_post[1]))
+    except OperationalError:
+        return error_response(code=400, message="something error!")
+
+
+# get card-post my bookmark
+@router.get("/my-bookmark", status_code=status.HTTP_200_OK)
+async def post_master_my_bookmark(request:Request,limit:Optional[int] = 10, offset:Optional[int] = 0):
+    logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    user_data = {
+        "logged_in_user":logged_in_user,
+        "logged_in_lat" :user.lat,
+        "logged_in_long" :user.long
+    }
+
+    sql = post_master_token(**user_data)
+    where = " and abo.id notnull"
+    orderby = " abo.created_at desc"
     
-    if type_name == 'my-comment-post':
-        where = " and ac.id notnull"
-        orderby = " ac.created_at desc"
+    orderby = " order by {orderby} nulls last limit {limit} offset {offset}".format(orderby=orderby,limit=limit,offset=offset)
+
+    sql = sql + where + orderby
+    print(sql)
+    try:
+        async with in_transaction() as connection:
+            card_post = await connection.execute_query(sql)
+            return success_response(post_master_token_response(card_post[1]))
+    except OperationalError:
+        return error_response(code=400, message="something error!")
+
+
+# get card-post my like
+@router.get("/my_like", status_code=status.HTTP_200_OK)
+async def post_master_my_like(request:Request,limit:Optional[int] = 10, offset:Optional[int] = 0):
+    logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    user_data = {
+        "logged_in_user":logged_in_user,
+        "logged_in_lat" :user.lat,
+        "logged_in_long" :user.long
+    }
+
+    sql = post_master_token(**user_data)
+    where = " and al.id notnull"
+    orderby = " al.created_at desc"
+    
+    orderby = " order by {orderby} nulls last limit {limit} offset {offset}".format(orderby=orderby,limit=limit,offset=offset)
+
+    sql = sql + where + orderby
+    print(sql)
+    try:
+        async with in_transaction() as connection:
+            card_post = await connection.execute_query(sql)
+            return success_response(post_master_token_response(card_post[1]))
+    except OperationalError:
+        return error_response(code=400, message="something error!")
+
+
+# get card-post my-comment-post
+@router.get("/my-comment-post", status_code=status.HTTP_200_OK)
+async def post_master_my_comment_post(request:Request,limit:Optional[int] = 10, offset:Optional[int] = 0):
+    logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    user_data = {
+        "logged_in_user":logged_in_user,
+        "logged_in_lat" :user.lat,
+        "logged_in_long" :user.long
+    }
+
+    sql = post_master_token(**user_data)
+    where = " and ac.id notnull"
+    orderby = " ac.created_at desc"
 
     orderby = " order by {orderby} nulls last limit {limit} offset {offset}".format(orderby=orderby,limit=limit,offset=offset)
 
@@ -118,6 +185,7 @@ async def post_master_user_type(request:Request,type_name:str,limit:Optional[int
             return success_response(post_master_token_response(card_post[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
+
 
 
 # get card-post single

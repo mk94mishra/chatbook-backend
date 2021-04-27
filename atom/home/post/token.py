@@ -13,7 +13,7 @@ from atom.home.post.schemas import PostCreate
 from atom.user.models import User
 
 
-router = APIRouter(prefix='/v1/private/post', tags=["post"])
+router = APIRouter(prefix='/v1/token/post', tags=["post"])
 
 
 # create post

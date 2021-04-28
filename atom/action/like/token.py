@@ -28,12 +28,10 @@ async def like_post_create(request: Request, payload: LikePostCreate):
     return success_response(await LikePost.create(**data))
 
 # delete like post
-@router.delete("/like-post/post/{post_id}/user/{user_id}", status_code=status.HTTP_201_CREATED)
+@router.delete("/like-post/post/{post_id}", status_code=status.HTTP_201_CREATED)
 async def like_post_delete(request: Request,post_id:int, user_id:int):
     # self user check
-    if int(user_id) != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
-
+    user_id = int(request.state.user_id)
     try:
         await LikePost.get(user_id=user_id, post_id=post_id).delete()
         return success_response({"msg":"post dislike successfully"})
@@ -58,12 +56,10 @@ async def like_comment_create(request: Request, payload: LikeCommentCreate):
     return success_response(await LikeComment.create(**data))
 
 # delete like post
-@router.delete("/like-comment/comment/{comment_id}/user/{user_id}", status_code=status.HTTP_201_CREATED)
+@router.delete("/like-comment/comment/{comment_id}", status_code=status.HTTP_201_CREATED)
 async def like_comment_delete(request: Request, comment_id:int, user_id:int):
 
-    # self user check
-    if int(user_id) != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
+    user_id = int(request.state.user_id)
     try:
         await LikeComment.get(user_id=user_id, comment_id=comment_id).delete()
         return success_response({"msg":"comment dislike successfully"})

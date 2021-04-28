@@ -28,12 +28,10 @@ async def bookmark_post_create(request: Request, payload: BookmarkCreate):
     return success_response(await Bookmark.create(**data))
 
 # delete bookmark post
-@router.delete("/bookmark-post/post/{post_id}/user/{user_id}", status_code=status.HTTP_201_CREATED)
-async def bookmark_post_delete(request: Request,post_id:int, user_id:int):
+@router.delete("/bookmark-post/post/{post_id}", status_code=status.HTTP_201_CREATED)
+async def bookmark_post_delete(request: Request,post_id:int):
 
-    # self user check
-    if int(user_id) != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
+    user_id = int(request.state.user_id)
     try:
         await Bookmark.get(user_id=user_id, post_id=post_id).delete()
         return success_response({"msg":"post un-bookmarked successfully"})

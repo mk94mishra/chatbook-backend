@@ -29,7 +29,7 @@ async def block_create(request: Request, payload: BlockCreate):
 
 # delete block 
 @router.delete("/block/{blocked_id}", status_code=status.HTTP_201_CREATED)
-async def rating_delete(request: Request,blocked_id:int):
+async def block_delete(request: Request,blocked_id:int):
 
     user_id = int(request.state.user_id)
     try:

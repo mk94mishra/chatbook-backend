@@ -48,7 +48,7 @@ async def post_master_single(request:Request,post_id: int):
 
 # get card-post single user
 @router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
-async def post_master_single(request:Request,user_id: int):
+async def post_master_user(request:Request,user_id: int):
     sql = "select * from tbl_post_master"
     where = " where user_id = {user_id}".format(user_id=user_id)
     

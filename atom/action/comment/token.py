@@ -37,26 +37,6 @@ async def comment_create(request: Request, payload: CommentCreate):
     return success_response(comment)
 
 
-# update comment
-@router.put("/{comment_id}", status_code=status.HTTP_200_OK)
-async def comment_update(request: Request, comment_id: int, payload: CommentUpdate):
-    data = deepcopy(payload.dict())
-    comment = await Comment.get(id=comment_id)
-
-    # self user check
-    if comment.user_id != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
-
-    data['updated_by'] = request.state.user_id
-
-    if data['media_url']:
-        data['media_type'] = "image"
-    else:
-        data['media_type'] = ""
-
-    await Comment(id=comment_id, **data).save(update_fields=data.keys())
-    return success_response({"msg":"data updated!"})
-
 
 # delete comment
 @router.delete("/{comment_id}", status_code=status.HTTP_200_OK)
@@ -64,9 +44,6 @@ async def comment_delete(request: Request, comment_id: int):
     comment = await Comment.get(id=comment_id)
     if comment.user_id != request.state.user_id:
         return error_response(code=400, message="you don't have permision!")
-    data = dict()
-    data['updated_by'] = request.state.user_id
-    data['is_active'] = False
-    data['is_deleted'] = True
-    await Comment(id=comment_id).delete()
+
+    await Comment.get(id=comment_id).delete()
     return success_response({"msg":"comment deleted"})

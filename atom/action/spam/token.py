@@ -23,6 +23,6 @@ async def spam_post_create(request: Request, payload: SpamCreate):
     data = {k: v for k, v in payload.dict().items() if v is not None}
 
     data['created_by'] = request.state.user_id
-    data['updated_by'] = request.state.user_id
+    data['updated_by'] = request.state.user_id 
     
     return success_response(await Spam.create(**data))

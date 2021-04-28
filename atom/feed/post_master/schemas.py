@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 class Feed(BaseModel):
     type: str
-    tab: str
     distance:  Optional[int] = None 
     gender:  Optional[str] = None 
 

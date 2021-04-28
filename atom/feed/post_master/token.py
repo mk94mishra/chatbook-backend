@@ -14,9 +14,9 @@ from atom.helper.helper import post_master_token, post_master_token_response
 router = APIRouter(prefix='/v1/token/feed-post', tags=["token-feed-post"])
 
 
-# get card-post all
-@router.post("", status_code=status.HTTP_200_OK)
-async def card_post_all(request:Request,payload: Feed):
+# get card-post fresh
+@router.post("/fresh", status_code=status.HTTP_200_OK)
+async def post_master_fresh(request:Request,payload: Feed):
     data = deepcopy(payload.dict())
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
@@ -39,14 +39,6 @@ async def card_post_all(request:Request,payload: Feed):
         where = where + " and st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) <= {distance}".format(logged_in_lat=logged_in_lat,logged_in_long=logged_in_long,distance=data['distance'])
     if data['gender']:
         where = where + " and gender = '{gender}'".format(gender=data['gender'])
-    order_by = ""
-    if data['tab'] == 'fresh':
-        order_by = "created_at desc"
-    if data['tab'] == 'most-liked':
-        order_by = "count_like desc"
-    if data['tab'] == 'trending':
-        where = where + " and p.ageing <= 1"
-        order_by = "count_like desc"
     
     if data['type'] == 'home':
         pass
@@ -66,18 +58,130 @@ async def card_post_all(request:Request,payload: Feed):
             return error_response(code=400, message="must be set designation_id!")
         where = where + " and designation_id = {designation_id}".format(designation_id=data['designation_id'])
 
-    orderby = " order by {order_by} nulls last limit {limit} offset {offset}".format(order_by=order_by,limit=data['limit'],offset=data['offset'])
+    orderby = " order by created_at desc nulls last limit {limit} offset {offset}".format(limit=data['limit'],offset=data['offset'])
 
     sql = sql + where + orderby
     print(sql)
     try:
         async with in_transaction() as connection:
-            card_post = await connection.execute_query(sql)
-            return success_response(post_master_token_response(card_post[1]))
+            post_master = await connection.execute_query(sql)
+            return success_response(post_master_token_response(post_master[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
 
 
+
+# get card-post most liked
+@router.post("/most-liked", status_code=status.HTTP_200_OK)
+async def post_master_most_liked(request:Request,payload: Feed):
+    data = deepcopy(payload.dict())
+    logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    logged_in_community_id = user.community_id
+    if user.community_id == None:
+        return error_response(code=400, message="must be set community!")
+    logged_in_lat = user.lat
+    logged_in_long = user.long
+    user_data = {
+        "logged_in_user": logged_in_user,
+        "logged_in_lat":logged_in_lat,
+        "logged_in_long":logged_in_long
+    }
+    sql = post_master_token(**user_data)
+    #where = " and community_id={logged_in_community_id}".format(logged_in_community_id=logged_in_community_id)
+
+    where = ""
+
+    if data['distance']:
+        where = where + " and st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) <= {distance}".format(logged_in_lat=logged_in_lat,logged_in_long=logged_in_long,distance=data['distance'])
+    if data['gender']:
+        where = where + " and gender = '{gender}'".format(gender=data['gender'])
+    
+    if data['type'] == 'home':
+        pass
+
+    if data['type'] == 'search':
+        if not data['description']:
+            return error_response(code=400, message="must be set search text!")
+        where = where + " and description like '%{description}%'".format(description=data['description'])
+
+    if data['type'] == 'category':
+        if not data['category_id']:
+            return error_response(code=400, message="must be set category_id!")
+        where = where + " and category_id = {category_id}".format(category_id=data['category_id'])
+
+    if data['type'] == 'designation':
+        if not data['designation_id']:
+            return error_response(code=400, message="must be set designation_id!")
+        where = where + " and designation_id = {designation_id}".format(designation_id=data['designation_id'])
+
+    orderby = " order by count_like desc nulls last limit {limit} offset {offset}".format(limit=data['limit'],offset=data['offset'])
+
+    sql = sql + where + orderby
+    print(sql)
+    try:
+        async with in_transaction() as connection:
+            post_master = await connection.execute_query(sql)
+            return success_response(post_master_token_response(post_master[1]))
+    except OperationalError:
+        return error_response(code=400, message="something error!")
+
+
+
+# get card-post trending
+@router.post("/trending", status_code=status.HTTP_200_OK)
+async def post_master_trending(request:Request,payload: Feed):
+    data = deepcopy(payload.dict())
+    logged_in_user = request.state.user_id
+    user = await User.get(id=logged_in_user)
+    logged_in_community_id = user.community_id
+    if user.community_id == None:
+        return error_response(code=400, message="must be set community!")
+    logged_in_lat = user.lat
+    logged_in_long = user.long
+    user_data = {
+        "logged_in_user": logged_in_user,
+        "logged_in_lat":logged_in_lat,
+        "logged_in_long":logged_in_long
+    }
+    sql = post_master_token(**user_data)
+    #where = " and community_id={logged_in_community_id}".format(logged_in_community_id=logged_in_community_id)
+
+    where = " and p.ageing <= 1"
+
+    if data['distance']:
+        where = where + " and st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) <= {distance}".format(logged_in_lat=logged_in_lat,logged_in_long=logged_in_long,distance=data['distance'])
+    if data['gender']:
+        where = where + " and gender = '{gender}'".format(gender=data['gender'])
+    
+    if data['type'] == 'home':
+        pass
+
+    if data['type'] == 'search':
+        if not data['description']:
+            return error_response(code=400, message="must be set search text!")
+        where = where + " and description like '%{description}%'".format(description=data['description'])
+
+    if data['type'] == 'category':
+        if not data['category_id']:
+            return error_response(code=400, message="must be set category_id!")
+        where = where + " and category_id = {category_id}".format(category_id=data['category_id'])
+
+    if data['type'] == 'designation':
+        if not data['designation_id']:
+            return error_response(code=400, message="must be set designation_id!")
+        where = where + " and designation_id = {designation_id}".format(designation_id=data['designation_id'])
+
+    orderby = " order by count_like desc nulls last limit {limit} offset {offset}".format(limit=data['limit'],offset=data['offset'])
+
+    sql = sql + where + orderby
+    print(sql)
+    try:
+        async with in_transaction() as connection:
+            post_master = await connection.execute_query(sql)
+            return success_response(post_master_token_response(post_master[1]))
+    except OperationalError:
+        return error_response(code=400, message="something error!")
 
 # get card-post my-post
 @router.get("/my-post", status_code=status.HTTP_200_OK)

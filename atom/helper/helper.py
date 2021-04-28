@@ -7,13 +7,13 @@ from common.response import error_response, success_response
 def post_master_token(**data):
     sql = """
         with
-        al as (select id,post_id,created_at from tbl_action where type='like' and user_id={logged_in_user}),
-        ac as (select array_agg(id) as id, post_id, max(created_at) as created_at from tbl_action where type='comment' and user_id={logged_in_user} group by post_id),
-        abo as (select id,post_id ,created_at from tbl_action where type='bookmark' and user_id={logged_in_user}),
-        asp as (select id,post_id ,created_at from tbl_action where type='spam' and user_id={logged_in_user}),
-        ar as (select id,user_id_rated_id, rating,created_at from tbl_action where type='rating' and user_id={logged_in_user}),
-        ab1 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id={logged_in_user}),
-        ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user}),
+        al as (select id,post_id,created_at from tbl_like_post where user_id={logged_in_user}),
+        ac as (select array_agg(id) as id, post_id, max(created_at) as created_at from tbl_comment where user_id={logged_in_user} group by post_id),
+        abo as (select id,post_id ,created_at from tbl_bookmark where user_id={logged_in_user}),
+        asp as (select id,post_id ,created_at from tbl_spam where user_id={logged_in_user}),
+        ar as (select id,rated_id, rating,created_at from tbl_rating where user_id={logged_in_user}),
+        ab1 as (select id, user_id, blocked_id from tbl_block  where user_id={logged_in_user}),
+        ab2 as (select id, user_id, blocked_id from tbl_block where blocked_id ={logged_in_user}),
         cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user} and is_activated isnull group by receiver_id)
 
         select 
@@ -32,8 +32,8 @@ def post_master_token(**data):
         left join ac on p.id=ac.post_id
         left join abo on p.id=abo.post_id
         left join asp on p.id=asp.post_id
-        left join ar on p.user_id=ar.user_id_rated_id
-        left join ab1 on p.user_id=ab1.user_id_blocked_id
+        left join ar on p.user_id=ar.rated_id
+        left join ab1 on p.user_id=ab1.blocked_id
         left join ab2 on p.user_id=ab2.user_id
         left join cr on p.user_id=cr.receiver_id
         where is_active=true 
@@ -126,10 +126,10 @@ def post_master_public_response(data):
 def comment_master_token(**data):
     sql = """
         with
-        acl as (select id,comment_id,created_at from tbl_action where type='comment-like' and user_id={logged_in_user}),
-        ar as (select id,user_id_rated_id, rating,created_at from tbl_action where type='rating' and user_id={logged_in_user}),
-        ab1 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id={logged_in_user}),
-        ab2 as (select id, user_id, user_id_blocked_id from tbl_action  where type='block' and user_id_blocked_id ={logged_in_user}),
+        acl as (select id,comment_id,created_at from tbl_like_comment where user_id={logged_in_user}),
+        ar as (select id,rated_id, rating,created_at from tbl_rating where user_id={logged_in_user}),
+        ab1 as (select id, user_id, blocked_id from tbl_block  where user_id={logged_in_user}),
+        ab2 as (select id, user_id, blocked_id from tbl_block  where blocked_id ={logged_in_user}),
         cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user} and is_activated isnull group by receiver_id)
 
         select 
@@ -139,10 +139,10 @@ def comment_master_token(**data):
         ab1.id as action_id_block,
         ab2.id as action_id_block_me,
         cr.count_pending_request
-        from tbl_card_comment as c
+        from tbl_comment_master as c
         left join acl on c.id=acl.comment_id
-        left join ar on c.user_id=ar.user_id_rated_id
-        left join ab1 on c.user_id=ab1.user_id_blocked_id
+        left join ar on c.user_id=ar.rated_id
+        left join ab1 on c.user_id=ab1.blocked_id
         left join ab2 on c.user_id=ab2.user_id
         left join cr on c.user_id=cr.receiver_id
         where 
@@ -157,7 +157,7 @@ async def update_avg_rating(user_id):
         async with in_transaction() as connection:
             sql = """
             update tbl_user set rating=r.rating
-            from (select avg((data->'rating')::float) as rating from tbl_action where (data->'user_id_rated_id')::int={user_id} and type='rating') as r
+            from (select avg(rating) as rating from tbl_rating where rated_id={user_id}) as r
             where id = {user_id}
             """.format(user_id =user_id)
             await connection.execute_query(sql)

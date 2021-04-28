@@ -13,7 +13,12 @@ class Settings:
     models_path = [
         'atom.user.models',
         'atom.chat.models',
-        'atom.action.models',
+        'atom.action.bookmark.models',
+        'atom.action.like.models',
+        'atom.action.spam.models',
+        'atom.action.comment.models',
+        'atom.action.block.models',
+        'atom.action.rating.models',
         #admin
         'atom.option.models',
         # post

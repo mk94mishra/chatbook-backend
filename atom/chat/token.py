@@ -12,7 +12,7 @@ from common.response import error_response, success_response
 from atom.chat.models import Chat, ChatRequest
 from atom.chat.schemas import ChatCreate, ChatUpdate, ChatRequestConfirm, ChatRequestCheck
 
-router = APIRouter(prefix='/v1/private', tags=["chat"])
+router = APIRouter(prefix='/v1/token', tags=["chat"])
 
 
 # chat request check

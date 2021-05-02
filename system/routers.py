@@ -22,7 +22,7 @@ from atom.feed.comment_master.token import router as comment_master_token_router
 from fastapi import FastAPI
 
 # set openapi_url = "" in production
-app = FastAPI(openapi_url = "/openapi.json", title = "chatbook backend", version = "1.0")
+app = FastAPI(openapi_url = "/openapi.json", title = "chatboook backend", version = "1.0")
 
 # include routers
 app.include_router(user_token_router)

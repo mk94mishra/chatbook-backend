@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request, status, HTTPException, Depends
 from tortoise.transactions import in_transaction
 from tortoise.exceptions import DoesNotExist, OperationalError
 import json
+from system.redis_connection import redis_conn
 from common.response import error_response, success_response
 
 from atom.user.models import User
@@ -24,8 +25,11 @@ async def post_master_all(request:Request,limit: Optional[int] = 10, offset: Opt
     print(sql)
     try:
         async with in_transaction() as connection:
-            card_post = await connection.execute_query(sql)
-            return success_response(post_master_public_response(card_post[1]))
+            post_master = await connection.execute_query(sql)
+            if post_master[1]:
+                redis_conn.lpush('post_master', "dgdsg","dsgsag","sdggg")
+            #print(redis_conn.lpop('post_master'))
+            return success_response(post_master_public_response(post_master[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
 

@@ -27,7 +27,7 @@ async def post_master_all(request:Request,limit: Optional[int] = 10, offset: Opt
         async with in_transaction() as connection:
             post_master = await connection.execute_query(sql)
             if post_master[1]:
-                redis_conn.lpush('post_master', "dgdsg","dsgsag","sdggg")
+                redis_conn.lpush('post_master', post_master_public_response(post_master[1]))
             #print(redis_conn.lpop('post_master'))
             return success_response(redis_conn.lpop('post_master'))
     except OperationalError:

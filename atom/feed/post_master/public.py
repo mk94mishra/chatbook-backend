@@ -29,7 +29,7 @@ async def post_master_all(request:Request,limit: Optional[int] = 10, offset: Opt
             if post_master[1]:
                 redis_conn.lpush('post_master', post_master_public_response(post_master[1]))
             #print(redis_conn.lpop('post_master'))
-            return success_response(redis_conn.lpop('post_master'))
+            return success_response(post_master_public_response(post_master[1]))
     except OperationalError:
         return error_response(code=400, message="something error!")
 

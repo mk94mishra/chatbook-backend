@@ -53,7 +53,7 @@ def post_master_token_response(data):
 
         post = {
             "post_id":card_single['id'],
-            "created_at":card_single['created_at'],
+            "created_at":str(card_single['created_at']),
             "description":card_single['description'],
             "media":media_data,
             "community_id":card_single['community_id'],
@@ -100,7 +100,7 @@ def post_master_public_response(data):
 
         post = {
             "post_id":card_single['id'],
-            "created_at":card_single['created_at'],
+            "created_at":str(card_single['created_at']),
             "description":card_single['description'],
             "media":media_data,
             "community_id":card_single['community_id'],

@@ -27,7 +27,7 @@ class Settings:
 
     SERVICE_NAME = _config.get("SERVICE_NAME", cast=str, default="chatbook-backend")
     SERVICE_HOST = _config.get("SERVICE_HOST", cast=str, default="0.0.0.0")
-    SERVICE_PORT = _config.get("SERVICE_PORT", cast=int, default=8000)
+    SERVICE_PORT = _config.get("SERVICE_PORT", cast=int, default=8001)
     SERVICE_ENV = _config.get("SERVICE_ENV", cast=str, default="local")
     DEBUG = _config.get("DEBUG", cast=bool, default=True)
     SECRET_KEY = _config.get("SECRET_KEY", cast=str, default="Asjfwol2asfs13tg123142Ags1k23hnSA36as6f4qQ324FEsvb")

@@ -7,8 +7,8 @@ from tortoise.transactions import in_transaction
 from common.validation import form_validation, media_validation
 from common.response import error_response, success_response
 
-from atom.home.post.models import Post
-from atom.home.post.schemas import PostCreate
+from atom.post.models import Post
+from atom.post.schemas import PostCreate
 
 from atom.user.models import User
 

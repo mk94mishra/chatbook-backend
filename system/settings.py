@@ -22,7 +22,7 @@ class Settings:
         #admin
         'atom.option.models',
         # post
-        'atom.home.post.models'
+        'atom.post.models'
         ]
 
     SERVICE_NAME = _config.get("SERVICE_NAME", cast=str, default="chatbook-backend")

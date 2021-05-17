@@ -13,7 +13,7 @@ from atom.option.token import router as option_token_router
 from atom.option.public import router as option_public_router
 
 # post section import
-from atom.home.post.token import router as post_token_router
+from atom.post.token import router as post_token_router
 from atom.feed.post_master.token import router as post_master_token_router
 from atom.feed.post_master.public import router as post_master_public_router
 from atom.feed.comment_master.token import router as comment_master_token_router

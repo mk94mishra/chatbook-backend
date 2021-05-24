@@ -7,6 +7,9 @@ class RatingCreate(BaseModel):
     rated_id: int
     rating: float
 
+class RatingUpdate(BaseModel):
+    rating: float
+
 class RatingDelete(BaseModel):
     user_id: int
     rated_id: int

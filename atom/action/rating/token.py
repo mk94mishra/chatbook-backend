@@ -6,7 +6,7 @@ from system.settings import settings
 from common.response import error_response, success_response
 
 from atom.action.rating.models import Rating
-from atom.action.rating.schemas import RatingCreate, RatingDelete
+from atom.action.rating.schemas import RatingCreate, RatingUpdate, RatingDelete
 
 from atom.helper.helper import update_avg_rating
 
@@ -32,12 +32,13 @@ async def rating_create(request: Request, payload: RatingCreate):
 
 
 # update rating
-@router.post("", status_code=status.HTTP_201_CREATED)
-async def rating_update(request: Request, payload: RatingCreate):
+@router.put("/{rating_id}", status_code=status.HTTP_201_CREATED)
+async def rating_update(request: Request, rating_id: int,payload: RatingUpdate):
     data = deepcopy(payload.dict())
 
+    rating_data = await Rating.get(id=rating_id)
     # self user check
-    if int(data['user_id']) != int(request.state.user_id):
+    if rating_data.user_id != int(request.state.user_id):
         return error_response(code=400, message="you don't have permision!")
 
     data = {k: v for k, v in payload.dict().items() if v is not None}
@@ -45,11 +46,11 @@ async def rating_update(request: Request, payload: RatingCreate):
     data['updated_by'] = request.state.user_id
     
     await update_avg_rating(data['rated_id'])
-    await Rating(id=data['user_id'], **data).save(update_fields=data.keys())
+    await Rating(id=rating_id,rating=data['rating']).save(update_fields=['rating'])
     return success_response("data updated!")
 
 # delete rating 
-@router.delete("/rating/{rated_id}", status_code=status.HTTP_201_CREATED)
+@router.delete("/{rated_id}", status_code=status.HTTP_201_CREATED)
 async def rating_delete(request: Request,rated_id:int):
 
     user_id = int(request.state.user_id)

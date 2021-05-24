@@ -124,18 +124,25 @@ async def user_check(request: Request, user_id:int):
 # get user
 @router.get("/{user_id}", status_code=status.HTTP_200_OK)
 async def user_read(request: Request, user_id:int):
+   
     try:
         async with in_transaction() as connection:
-            sql = """select id, username,
-                profile_pic_url,gender,rating
-                from tbl_user
+            sql = """select u.id as id, u.username, 
+                u.profile_pic_url,u.gender,u.rating,u.dob,u.community_id, u.community_name,
+                ud.id as designation_id, ud.name as designation_name
+                from (SELECT u.*,com.name as community_name
+                from tbl_user as u
+                left join tbl_option as com 
+                on u.community_id = com.id) as u
+                left join tbl_option as ud
+                on u.designation_id=ud.id
                 """
 
-            filter = " where is_active = 'true' and id={user_id}".format(user_id=user_id)
+            filter = " where u.is_active = 'true' and u.id={user_id}".format(user_id=user_id)
             sql = sql + filter
+
             user = await connection.execute_query(sql)
          
             return success_response(user[1])
     except OperationalError:
         return error_response(code=400, message="something error!")
-

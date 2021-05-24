@@ -30,6 +30,24 @@ async def rating_create(request: Request, payload: RatingCreate):
     await update_avg_rating(data['rated_id'])
     return success_response(await Rating.create(**data))
 
+
+# update rating
+@router.post("", status_code=status.HTTP_201_CREATED)
+async def rating_update(request: Request, payload: RatingCreate):
+    data = deepcopy(payload.dict())
+
+    # self user check
+    if int(data['user_id']) != int(request.state.user_id):
+        return error_response(code=400, message="you don't have permision!")
+
+    data = {k: v for k, v in payload.dict().items() if v is not None}
+
+    data['updated_by'] = request.state.user_id
+    
+    await update_avg_rating(data['rated_id'])
+    await Rating(id=data['user_id'], **data).save(update_fields=data.keys())
+    return success_response("data updated!")
+
 # delete rating 
 @router.delete("/rating/{rated_id}", status_code=status.HTTP_201_CREATED)
 async def rating_delete(request: Request,rated_id:int):

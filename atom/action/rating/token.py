@@ -59,8 +59,7 @@ async def rating_delete(request: Request,rating_id:int):
         return error_response(code=400, message="you don't have permision!")
 
     try:
-        await Rating.get(rating_id=rating_id).delete()
-
+        await Rating.get(id=rating_id).delete()
         await update_avg_rating(rating_data.rated_id)
         return success_response({"msg":"rating deleted successfully"})
     except:

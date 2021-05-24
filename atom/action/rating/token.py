@@ -45,18 +45,23 @@ async def rating_update(request: Request, rating_id: int,payload: RatingUpdate):
 
     data['updated_by'] = request.state.user_id
     
-    await update_avg_rating(data['rated_id'])
+    await update_avg_rating(rating_data.rated_id)
     await Rating(id=rating_id,rating=data['rating']).save(update_fields=['rating'])
     return success_response("data updated!")
 
 # delete rating 
-@router.delete("/{rated_id}", status_code=status.HTTP_201_CREATED)
-async def rating_delete(request: Request,rated_id:int):
+@router.delete("/{rating_id}", status_code=status.HTTP_201_CREATED)
+async def rating_delete(request: Request,rating_id:int):
 
-    user_id = int(request.state.user_id)
+    rating_data = await Rating.get(id=rating_id)
+    # self user check
+    if rating_data.user_id != int(request.state.user_id):
+        return error_response(code=400, message="you don't have permision!")
+
     try:
-        await Rating.get(user_id=user_id, rated_id=rated_id).delete()
-        await update_avg_rating(rated_id)
+        await Rating.get(rating_id=rating_id).delete()
+
+        await update_avg_rating(rating_data.rated_id)
         return success_response({"msg":"rating deleted successfully"})
     except:
         return error_response(code=400, message="something error!")

@@ -116,7 +116,7 @@ async def user_delete(request: Request, user_id:int, payload: UserDelete):
             await connection.execute_query(sql)
             sql = "delete from tbl_rating where user_id={user_id}".format(user_id=user_id)
             await connection.execute_query(sql)
-            sql = "delete from tbl_spam where user_id={user_id}".format(user_id=user_id)
+            sql = "delete from tbl_comment where user_id={user_id}".format(user_id=user_id)
             await connection.execute_query(sql)
 
             sql = "update tbl_post set is_active=False, updated_by={user_id}, remark='by user' where user_id={user_id} and is_active=True".format(user_id=user_id)

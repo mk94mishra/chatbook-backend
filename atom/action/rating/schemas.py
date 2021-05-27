@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 class RatingCreate(BaseModel):
     user_id: int
-    rated_id: int
+    user_rated_id: int
     rating: float
 
 class RatingUpdate(BaseModel):
@@ -12,7 +12,7 @@ class RatingUpdate(BaseModel):
 
 class RatingDelete(BaseModel):
     user_id: int
-    rated_id: int
+    user_rated_id: int
 
 
 

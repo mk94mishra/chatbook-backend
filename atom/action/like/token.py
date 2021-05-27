@@ -29,7 +29,7 @@ async def like_post_create(request: Request, payload: LikePostCreate):
 
 # delete like post
 @router.delete("/like-post/post/{post_id}", status_code=status.HTTP_201_CREATED)
-async def like_post_delete(request: Request,post_id:int, user_id:int):
+async def like_post_delete(request: Request,post_id:int):
     # self user check
     user_id = int(request.state.user_id)
     try:
@@ -57,7 +57,7 @@ async def like_comment_create(request: Request, payload: LikeCommentCreate):
 
 # delete like post
 @router.delete("/like-comment/comment/{comment_id}", status_code=status.HTTP_201_CREATED)
-async def like_comment_delete(request: Request, comment_id:int, user_id:int):
+async def like_comment_delete(request: Request, comment_id:int):
 
     user_id = int(request.state.user_id)
     try:

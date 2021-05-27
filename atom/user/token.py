@@ -62,16 +62,15 @@ async def user_my_profile(request: Request):
 
     try:
         async with in_transaction() as connection:
-            sql = """select u.id as id, u.username, u.phone, 
-                u.profile_pic_url,u.gender,u.rating,u.dob,u.community_id, u.community_name,
+            sql = """select
+                u.id as id, u.username, u.phone, 
                 case when u.password notnull then true else false end as is_password,
-                ud.id as designation_id, ud.name as designation_name
-                from (SELECT u.*,com.name as community_name
+                u.profile_pic_url,u.gender,u.rating,u.dob,u.community_id, u.designation_id,
+                od.name as designation_name,
+                oc.name as community_name
                 from tbl_user as u
-                left join tbl_option as com 
-                on u.community_id = com.id) as u
-                left join tbl_option as ud
-                on u.designation_id=ud.id
+                left join tbl_option as od on u.designation_id=od.id
+                left join tbl_option as oc on u.community_id=oc.id
                 """
 
             filter = " where u.is_active = 'true' and u.id={user_id}".format(user_id=user_id)

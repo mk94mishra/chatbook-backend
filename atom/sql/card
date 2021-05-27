@@ -1,4 +1,4 @@
-1. tbl_card_post 
+1. tbl_post_master 
 
 create or replace view tbl_post_master as (
 with

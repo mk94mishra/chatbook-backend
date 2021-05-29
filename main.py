@@ -2,6 +2,7 @@ import time
 from fastapi import Request
 from tortoise.contrib.fastapi import register_tortoise
 import uvicorn
+from common.sql_init import tbl_post_master_sql_init, tbl_comment_master_sql_init, tbl_chat_group_sql_init
 from common.middleware import AuthMiddleware
 from system.routers import app
 from system.settings import settings
@@ -15,6 +16,12 @@ register_tortoise(
     add_exception_handlers=True
 )
 app.add_middleware(AuthMiddleware, exclude=['/v1/public', '/docs', '/redoc', '/openapi'])
+
+@app.on_event("startup")
+async def startup_event():
+    await tbl_post_master_sql_init()
+    await tbl_comment_master_sql_init()
+    await tbl_chat_group_sql_init()
 
 @app.middleware("http")
 async def add_process_token_header(request: Request, call_next):

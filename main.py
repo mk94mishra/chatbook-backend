@@ -15,13 +15,14 @@ register_tortoise(
     generate_schemas=True,
     add_exception_handlers=True
 )
-app.add_middleware(AuthMiddleware, exclude=['/v1/public', '/docs', '/redoc', '/openapi'])
 
 @app.on_event("startup")
 async def startup_event():
     await tbl_post_master_sql_init()
     await tbl_comment_master_sql_init()
     await tbl_chat_group_sql_init()
+
+app.add_middleware(AuthMiddleware, exclude=['/v1/public', '/docs', '/redoc', '/openapi'])
 
 @app.middleware("http")
 async def add_process_token_header(request: Request, call_next):

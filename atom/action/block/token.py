@@ -37,10 +37,10 @@ async def user_block_list(request: Request, limit: Optional[int] = 10, offset: O
         async with in_transaction() as connection:
             sql = """
             with 
-            ab as (select id, created_at, blocked_id from tbl_block where user_id={logged_user_id})
+            ab as (select id, created_at, user_blocked_id from tbl_block where user_id={logged_user_id})
 
             select
-            ab.id, ab.blocked_id, ab.created_at ,
+            ab.id, ab.user_blocked_id, ab.created_at ,
             u.username,u.profile_pic_url
             from ab
             left join tbl_user as u on ab.blocked_id=u.id
@@ -56,12 +56,12 @@ async def user_block_list(request: Request, limit: Optional[int] = 10, offset: O
 
 
 # delete block 
-@router.delete("/block/{blocked_id}", status_code=status.HTTP_201_CREATED)
-async def block_delete(request: Request,blocked_id:int):
+@router.delete("/block/{user_blocked_id}", status_code=status.HTTP_201_CREATED)
+async def block_delete(request: Request,user_blocked_id:int):
 
     user_id = int(request.state.user_id)
     try:
-        await Block.get(user_id=user_id, blocked_id=blocked_id).delete()
+        await Block.get(user_id=user_id, user_blocked_id=user_blocked_id).delete()
         return success_response({"msg":"block deleted successfully"})
     except:
         return error_response(code=400, message="something error!")

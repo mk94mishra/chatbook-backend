@@ -12,8 +12,8 @@ def post_master_token(**data):
         abo as (select id,post_id ,created_at from tbl_bookmark where user_id={logged_in_user}),
         asp as (select id,post_id ,created_at from tbl_spam where user_id={logged_in_user}),
         ar as (select id,rated_id, rating,created_at from tbl_rating where user_id={logged_in_user}),
-        ab1 as (select id, user_id, blocked_id from tbl_block  where user_id={logged_in_user}),
-        ab2 as (select id, user_id, blocked_id from tbl_block where blocked_id ={logged_in_user}),
+        ab1 as (select id, user_id, user_blocked_id from tbl_block  where user_id={logged_in_user}),
+        ab2 as (select id, user_id, user_blocked_id from tbl_block where user_blocked_id ={logged_in_user}),
         cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user} and is_activated isnull group by receiver_id)
 
         select 
@@ -33,7 +33,7 @@ def post_master_token(**data):
         left join abo on p.id=abo.post_id
         left join asp on p.id=asp.post_id
         left join ar on p.user_id=ar.rated_id
-        left join ab1 on p.user_id=ab1.blocked_id
+        left join ab1 on p.user_id=ab1.user_blocked_id
         left join ab2 on p.user_id=ab2.user_id
         left join cr on p.user_id=cr.receiver_id
         where is_active=true 
@@ -128,8 +128,8 @@ def comment_master_token(**data):
         with
         acl as (select id,comment_id,created_at from tbl_like_comment where user_id={logged_in_user}),
         ar as (select id,rated_id, rating,created_at from tbl_rating where user_id={logged_in_user}),
-        ab1 as (select id, user_id, blocked_id from tbl_block  where user_id={logged_in_user}),
-        ab2 as (select id, user_id, blocked_id from tbl_block  where blocked_id ={logged_in_user}),
+        ab1 as (select id, user_id, user_blocked_id from tbl_block  where user_id={logged_in_user}),
+        ab2 as (select id, user_id, user_blocked_id from tbl_block  where user_blocked_id ={logged_in_user}),
         cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user} and is_activated isnull group by receiver_id)
 
         select 
@@ -142,7 +142,7 @@ def comment_master_token(**data):
         from tbl_comment_master as c
         left join acl on c.id=acl.comment_id
         left join ar on c.user_id=ar.rated_id
-        left join ab1 on c.user_id=ab1.blocked_id
+        left join ab1 on c.user_id=ab1.user_blocked_id
         left join ab2 on c.user_id=ab2.user_id
         left join cr on c.user_id=cr.receiver_id
         where 

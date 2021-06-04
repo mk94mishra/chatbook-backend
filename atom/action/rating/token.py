@@ -27,7 +27,7 @@ async def rating_create(request: Request, payload: RatingCreate):
     data['created_by'] = request.state.user_id
     data['updated_by'] = request.state.user_id
     
-    await update_avg_rating(data['rated_id'])
+    await update_avg_rating(data['user_rated_id'])
     return success_response(await Rating.create(**data))
 
 
@@ -60,7 +60,7 @@ async def rating_delete(request: Request,rating_id:int):
 
     try:
         await Rating.get(id=rating_id).delete()
-        await update_avg_rating(rating_data.rated_id)
+        await update_avg_rating(rating_data.user_rated_id)
         return success_response({"msg":"rating deleted successfully"})
     except:
         return error_response(code=400, message="something error!")

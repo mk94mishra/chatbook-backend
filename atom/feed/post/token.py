@@ -20,9 +20,6 @@ async def post_master_fresh(request:Request,payload: Feed):
     data = deepcopy(payload.dict())
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
-    logged_in_community_id = user.community_id
-    if user.community_id == None:
-        return error_response(code=400, message="must be set community!")
     logged_in_lat = user.lat
     logged_in_long = user.long
     user_data = {
@@ -31,7 +28,6 @@ async def post_master_fresh(request:Request,payload: Feed):
         "logged_in_long":logged_in_long
     }
     sql = post_master_token(**user_data)
-    #where = " and community_id={logged_in_community_id}".format(logged_in_community_id=logged_in_community_id)
 
     where = ""
 
@@ -40,22 +36,13 @@ async def post_master_fresh(request:Request,payload: Feed):
     if data['gender']:
         where = where + " and gender = '{gender}'".format(gender=data['gender'])
     
-    if data['type'] == 'home':
-        pass
-
-    if data['type'] == 'search':
-        if not data['description']:
-            return error_response(code=400, message="must be set search text!")
+    if data['description']:
         where = where + " and description like '%{description}%'".format(description=data['description'])
 
-    if data['type'] == 'category':
-        if not data['category_id']:
-            return error_response(code=400, message="must be set category_id!")
+    if data['category_id']:
         where = where + " and category_id = {category_id}".format(category_id=data['category_id'])
 
-    if data['type'] == 'designation':
-        if not data['designation_id']:
-            return error_response(code=400, message="must be set designation_id!")
+    if data['designation_id']:
         where = where + " and designation_id = {designation_id}".format(designation_id=data['designation_id'])
 
     orderby = " order by created_at desc nulls last limit {limit} offset {offset}".format(limit=data['limit'],offset=data['offset'])
@@ -77,9 +64,6 @@ async def post_master_most_liked(request:Request,payload: Feed):
     data = deepcopy(payload.dict())
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
-    logged_in_community_id = user.community_id
-    if user.community_id == None:
-        return error_response(code=400, message="must be set community!")
     logged_in_lat = user.lat
     logged_in_long = user.long
     user_data = {
@@ -88,7 +72,6 @@ async def post_master_most_liked(request:Request,payload: Feed):
         "logged_in_long":logged_in_long
     }
     sql = post_master_token(**user_data)
-    #where = " and community_id={logged_in_community_id}".format(logged_in_community_id=logged_in_community_id)
 
     where = ""
 
@@ -97,22 +80,13 @@ async def post_master_most_liked(request:Request,payload: Feed):
     if data['gender']:
         where = where + " and gender = '{gender}'".format(gender=data['gender'])
     
-    if data['type'] == 'home':
-        pass
-
-    if data['type'] == 'search':
-        if not data['description']:
-            return error_response(code=400, message="must be set search text!")
+    if data['description']:
         where = where + " and description like '%{description}%'".format(description=data['description'])
 
-    if data['type'] == 'category':
-        if not data['category_id']:
-            return error_response(code=400, message="must be set category_id!")
+    if data['category_id']:
         where = where + " and category_id = {category_id}".format(category_id=data['category_id'])
 
-    if data['type'] == 'designation':
-        if not data['designation_id']:
-            return error_response(code=400, message="must be set designation_id!")
+    if data['designation_id']:
         where = where + " and designation_id = {designation_id}".format(designation_id=data['designation_id'])
 
     orderby = " order by count_like desc nulls last limit {limit} offset {offset}".format(limit=data['limit'],offset=data['offset'])
@@ -134,9 +108,6 @@ async def post_master_trending(request:Request,payload: Feed):
     data = deepcopy(payload.dict())
     logged_in_user = request.state.user_id
     user = await User.get(id=logged_in_user)
-    logged_in_community_id = user.community_id
-    if user.community_id == None:
-        return error_response(code=400, message="must be set community!")
     logged_in_lat = user.lat
     logged_in_long = user.long
     user_data = {
@@ -145,7 +116,6 @@ async def post_master_trending(request:Request,payload: Feed):
         "logged_in_long":logged_in_long
     }
     sql = post_master_token(**user_data)
-    #where = " and community_id={logged_in_community_id}".format(logged_in_community_id=logged_in_community_id)
 
     where = " and p.ageing <= 1"
 
@@ -154,22 +124,13 @@ async def post_master_trending(request:Request,payload: Feed):
     if data['gender']:
         where = where + " and gender = '{gender}'".format(gender=data['gender'])
     
-    if data['type'] == 'home':
-        pass
-
-    if data['type'] == 'search':
-        if not data['description']:
-            return error_response(code=400, message="must be set search text!")
+    if data['description']:
         where = where + " and description like '%{description}%'".format(description=data['description'])
 
-    if data['type'] == 'category':
-        if not data['category_id']:
-            return error_response(code=400, message="must be set category_id!")
+    if data['category_id']:
         where = where + " and category_id = {category_id}".format(category_id=data['category_id'])
 
-    if data['type'] == 'designation':
-        if not data['designation_id']:
-            return error_response(code=400, message="must be set designation_id!")
+    if data['designation_id']:
         where = where + " and designation_id = {designation_id}".format(designation_id=data['designation_id'])
 
     orderby = " order by count_like desc nulls last limit {limit} offset {offset}".format(limit=data['limit'],offset=data['offset'])

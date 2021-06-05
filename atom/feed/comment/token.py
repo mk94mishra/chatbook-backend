@@ -13,13 +13,13 @@ from atom.helper.helper import comment_master_token
 router = APIRouter(prefix='/v1/token/feed-comment', tags=["token-feed-comment"])
 
 
-# get card-comment all
+# get feed-comment all
 @router.get("/post/{post_id}", status_code=status.HTTP_200_OK)
 async def comment_master_all(request:Request,post_id: int, limit: Optional[int]=10, offset: Optional[int]=0):
-    logged_in_user = request.state.user_id
-    user = await User.get(id=logged_in_user)
+    logged_in_user_id = request.state.user_id
+    user = await User.get(id=logged_in_user_id)
     user_data = {
-        "logged_in_user": logged_in_user,
+        "logged_in_user_id": logged_in_user_id,
         "logged_in_lat" :user.lat,
         "logged_in_long" :user.long
     }
@@ -37,13 +37,13 @@ async def comment_master_all(request:Request,post_id: int, limit: Optional[int]=
         return error_response(code=400, message="something error!")
 
         
-# get card-comment user
+# get feed-comment user
 @router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
 async def comment_master_user(request:Request,user_id: int, limit: Optional[int]=10, offset: Optional[int]=0):
-    logged_in_user = request.state.user_id
-    user = await User.get(id=logged_in_user)
+    logged_in_user_id = request.state.user_id
+    user = await User.get(id=logged_in_user_id)
     user_data = {
-        "logged_in_user": logged_in_user,
+        "logged_in_user_id": logged_in_user_id,
         "logged_in_lat" :user.lat,
         "logged_in_long" :user.long
     }
@@ -64,15 +64,15 @@ async def comment_master_user(request:Request,user_id: int, limit: Optional[int]
 # get feed-comment my comment
 @router.get("/my-comment", status_code=status.HTTP_200_OK)
 async def comment_master_my_comment(request:Request,limit: Optional[int]=10, offset: Optional[int]=0):
-    logged_in_user = request.state.user_id
-    user = await User.get(id=logged_in_user)
+    logged_in_user_id = request.state.user_id
+    user = await User.get(id=logged_in_user_id)
     user_data = {
-        "logged_in_user": logged_in_user,
+        "logged_in_user_id": logged_in_user_id,
         "logged_in_lat" :user.lat,
         "logged_in_long" :user.long
     }
     sql = comment_master_token(**user_data)
-    where = " and c.user_id={logged_in_user}".format(logged_in_user=logged_in_user)
+    where = " and c.user_id={logged_in_user_id}".format(logged_in_user_id=logged_in_user_id)
     orderby = " order by acl.created_at desc nulls last limit {limit} offset {offset}".format(limit=limit,offset=offset)
 
     sql = sql + where + orderby

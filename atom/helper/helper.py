@@ -7,39 +7,39 @@ from common.response import error_response, success_response
 def post_master_token(**data):
     sql = """
         with
-        al as (select id,post_id,created_at from tbl_like_post where user_id={logged_in_user}),
-        ac as (select array_agg(id) as id, post_id, max(created_at) as created_at from tbl_comment where user_id={logged_in_user} group by post_id),
-        abo as (select id,post_id ,created_at from tbl_bookmark where user_id={logged_in_user}),
-        asp as (select id,post_id ,created_at from tbl_spam where user_id={logged_in_user}),
-        ar as (select id,user_rated_id, rating,created_at from tbl_rating where user_id={logged_in_user}),
-        ab1 as (select id, user_id, user_blocked_id from tbl_block  where user_id={logged_in_user}),
-        ab2 as (select id, user_id, user_blocked_id from tbl_block where user_blocked_id ={logged_in_user}),
-        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user} and is_activated isnull group by receiver_id)
+        l as (select id,post_id,created_at from tbl_like_post where user_id={logged_in_user_id}),
+        c as (select array_agg(id) as id, post_id, max(created_at) as created_at from tbl_comment where user_id={logged_in_user_id} group by post_id),
+        bo as (select id,post_id ,created_at from tbl_bookmark where user_id={logged_in_user_id}),
+        sp as (select id,post_id ,created_at from tbl_spam where user_id={logged_in_user_id}),
+        r as (select id,user_rated_id, rating,created_at from tbl_rating where user_id={logged_in_user_id}),
+        b1 as (select id, user_id, user_blocked_id from tbl_block  where user_id={logged_in_user_id}),
+        b2 as (select id, user_id, user_blocked_id from tbl_block where user_blocked_id ={logged_in_user_id}),
+        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user_id} and is_activated isnull group by receiver_id)
 
         select 
         p.*,
-        al.id as action_like_id,al.created_at as action_like_created_at,
-        ac.id as action_comment_id,ac.created_at as action_comment_created_at,
-        abo.id as action_bookmark_id,abo.created_at as action_bookmark_created_at,
-        asp.id as action_spam_id, asp.created_at as action_spam_created_at,
-        ar.id as action_rating_id, ar.rating as action_rated, ar.created_at as action_rating_created_at,
-        ab1.id as action_id_block,
-        ab2.id as action_id_block_me,
+        l.id as like_id,l.created_at as like_created_at,
+        c.id as comment_id,c.created_at as comment_created_at,
+        bo.id as bookmark_id,bo.created_at as bookmark_created_at,
+        sp.id as spam_id, sp.created_at as spam_created_at,
+        r.id as rating_id, r.rating as rated, r.created_at as rating_created_at,
+        b1.id as id_block,
+        b2.id as id_block_me,
         st_distance(st_makepoint(p.lat,p.long), st_makepoint({logged_in_lat},{logged_in_long})) as distance,
         cr.count_pending_request
         from tbl_post_master as p
-        left join al on p.id=al.post_id
-        left join ac on p.id=ac.post_id
-        left join abo on p.id=abo.post_id
-        left join asp on p.id=asp.post_id
-        left join ar on p.user_id=ar.user_rated_id
-        left join ab1 on p.user_id=ab1.user_blocked_id
-        left join ab2 on p.user_id=ab2.user_id
+        left join l on p.id=l.post_id
+        left join c on p.id=c.post_id
+        left join bo on p.id=bo.post_id
+        left join sp on p.id=sp.post_id
+        left join r on p.user_id=r.user_rated_id
+        left join b1 on p.user_id=b1.user_blocked_id
+        left join b2 on p.user_id=b2.user_id
         left join cr on p.user_id=cr.receiver_id
         where is_active=true 
-        and ab1.id isnull
-        and ab2.id isnull
-        """.format(logged_in_user=data['logged_in_user'],logged_in_lat=data['logged_in_lat'],logged_in_long=data['logged_in_long'])
+        and b1.id isnull
+        and b2.id isnull
+        """.format(logged_in_user_id=data['logged_in_user_id'],logged_in_lat=data['logged_in_lat'],logged_in_long=data['logged_in_long'])
     
     return sql
 
@@ -72,17 +72,17 @@ def post_master_token_response(data):
             "count_like":card_single['count_like'],
             "count_comment":card_single['count_comment'],
 
-            "action_like_id":card_single['action_like_id'],
-            "action_like_created_at":card_single['action_like_created_at'],
-            "action_comment_id":card_single['action_comment_id'],
-            "action_comment_created_at":card_single['action_comment_created_at'],
-            "action_bookmark_id":card_single['action_bookmark_id'],
-            "action_bookmark_created_at":card_single['action_bookmark_created_at'],
-            "action_spam_id":card_single['action_spam_id'],
-            "action_spam_created_at":card_single['action_spam_created_at'],
-            "action_rating_id":card_single['action_rating_id'],
-            "action_rating_created_at":card_single['action_rating_created_at'],
-            "action_rated":card_single['action_rated'],
+            "like_id":card_single['like_id'],
+            "like_created_at":card_single['like_created_at'],
+            "comment_id":card_single['comment_id'],
+            "comment_created_at":card_single['comment_created_at'],
+            "bookmark_id":card_single['bookmark_id'],
+            "bookmark_created_at":card_single['bookmark_created_at'],
+            "spam_id":card_single['spam_id'],
+            "spam_created_at":card_single['spam_created_at'],
+            "rating_id":card_single['rating_id'],
+            "rating_created_at":card_single['rating_created_at'],
+            "rated":card_single['rated'],
             "distance":card_single['distance'],
             "count_pending_request": card_single['count_pending_request']
         }
@@ -126,29 +126,29 @@ def post_master_public_response(data):
 def comment_master_token(**data):
     sql = """
         with
-        acl as (select id,comment_id,created_at from tbl_like_comment where user_id={logged_in_user}),
-        ar as (select id,user_rated_id, rating,created_at from tbl_rating where user_id={logged_in_user}),
-        ab1 as (select id, user_id, user_blocked_id from tbl_block  where user_id={logged_in_user}),
-        ab2 as (select id, user_id, user_blocked_id from tbl_block  where user_blocked_id ={logged_in_user}),
-        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user} and is_activated isnull group by receiver_id)
+        cl as (select id,comment_id,created_at from tbl_like_comment where user_id={logged_in_user_id}),
+        r as (select id,user_rated_id, rating,created_at from tbl_rating where user_id={logged_in_user_id}),
+        b1 as (select id, user_id, user_blocked_id from tbl_block  where user_id={logged_in_user_id}),
+        b2 as (select id, user_id, user_blocked_id from tbl_block  where user_blocked_id ={logged_in_user_id}),
+        cr as (select receiver_id, count(id) as count_pending_request from tbl_chat_request where sender_id={logged_in_user_id} and is_activated isnull group by receiver_id)
 
         select 
         c.*,
-        acl.id as action_comment_like_id,acl.created_at as action_comment_like_created_at,
-        ar.id as action_rating_id, ar.rating as action_rated, ar.created_at as action_rating_created_at,
-        ab1.id as action_id_block,
-        ab2.id as action_id_block_me,
+        cl.id as comment_like_id,acl.created_at as comment_like_created_at,
+        r.id as rating_id, r.rating as rated, r.created_at as rating_created_at,
+        b1.id as id_block,
+        b2.id as id_block_me,
         cr.count_pending_request
         from tbl_comment_master as c
-        left join acl on c.id=acl.comment_id
-        left join ar on c.user_id=ar.user_rated_id
-        left join ab1 on c.user_id=ab1.user_blocked_id
-        left join ab2 on c.user_id=ab2.user_id
+        left join cl on c.id=acl.comment_id
+        left join r on c.user_id=r.user_rated_id
+        left join b1 on c.user_id=b1.user_blocked_id
+        left join b2 on c.user_id=b2.user_id
         left join cr on c.user_id=cr.receiver_id
         where 
-        ab1.id isnull
-        and ab2.id isnull
-        """.format(logged_in_user=data['logged_in_user'],logged_in_lat=data['logged_in_lat'],logged_in_long=data['logged_in_long'])
+        b1.id isnull
+        and b2.id isnull
+        """.format(logged_in_user_id=data['logged_in_user_id'],logged_in_lat=data['logged_in_lat'],logged_in_long=data['logged_in_long'])
     
     return sql
     

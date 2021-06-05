@@ -14,7 +14,7 @@ from atom.helper.helper import post_master_public_response
 router = APIRouter(prefix='/v1/public/feed-post', tags=["public-feed-post"])
 
 
-# get card-post all
+# get feed-post all
 @router.get("", status_code=status.HTTP_200_OK)
 async def post_master_all(request:Request,limit: Optional[int] = 10, offset: Optional[int] = 0):
     sql = " select * from tbl_post_master"
@@ -31,7 +31,7 @@ async def post_master_all(request:Request,limit: Optional[int] = 10, offset: Opt
 
 
 
-# get master-post single
+# get feed-post single
 @router.get("/post/{post_id}", status_code=status.HTTP_200_OK)
 async def post_master_single(request:Request,post_id: int):
     sql = "select * from tbl_post_master"
@@ -46,7 +46,7 @@ async def post_master_single(request:Request,post_id: int):
         return error_response(code=400, message="something error!")
 
 
-# get card-post single user
+# get feed-post single user
 @router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
 async def post_master_user(request:Request,user_id: int):
     sql = "select * from tbl_post_master"

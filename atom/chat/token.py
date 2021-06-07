@@ -10,9 +10,28 @@ from system.settings import settings
 from common.response import error_response, success_response
 
 from atom.chat.models import Chat, ChatRequest
-from atom.chat.schemas import ChatCreate, ChatUpdate, ChatRequestConfirm, ChatRequestCheck
+from atom.chat.schemas import ChatCreate, ChatUpdate, ChatRequestCreate, ChatRequestConfirm, ChatRequestCheck
 
 router = APIRouter(prefix='/v1/token', tags=["chat"])
+
+# chat request create
+@router.post("/chat/request-create", status_code=status.HTTP_200_OK)
+async def chat_request_create(request: Request, payload: ChatRequestCreate):
+    data = deepcopy(payload.dict())
+    # self user check
+    if int(data['sender_id']) != int(request.state.user_id):
+        return error_response(code=400, message="you don't have permision!")
+
+    data = {k: v for k, v in payload.dict().items() if v is not None}
+    # create group id
+    if data['sender_id'] < data['receiver_id']:
+        data['group_id'] = "{sender_id}-{receiver_id}".format(sender_id=data['sender_id'],receiver_id=data['receiver_id'])
+    else:
+        data['group_id'] = "{receiver_id}-{sender_id}".format(receiver_id=data['receiver_id'], sender_id=data['sender_id'])
+
+    return success_response(await ChatRequest.create(**data))
+
+
 
 
 # chat request check
@@ -34,24 +53,6 @@ async def chat_request_check(request: Request, payload: ChatRequestCheck):
     else:
         response  = False
     return success_response(response)
-
-
-# chat request create
-@router.post("/chat/request-create", status_code=status.HTTP_200_OK)
-async def chat_request_create(request: Request, payload: ChatCreate):
-    data = deepcopy(payload.dict())
-    # self user check
-    if int(data['sender_id']) != int(request.state.user_id):
-        return error_response(code=400, message="you don't have permision!")
-
-    data = {k: v for k, v in payload.dict().items() if v is not None}
-    # create group id
-    if data['sender_id'] < data['receiver_id']:
-        data['group_id'] = "{sender_id}-{receiver_id}".format(sender_id=data['sender_id'],receiver_id=data['receiver_id'])
-    else:
-        data['group_id'] = "{receiver_id}-{sender_id}".format(receiver_id=data['receiver_id'], sender_id=data['sender_id'])
-
-    return success_response(await ChatRequest.create(**data))
 
 
 

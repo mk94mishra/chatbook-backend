@@ -15,9 +15,10 @@ router = APIRouter(prefix='/v1/public/feed-post', tags=["public-feed-post"])
 
 
 # get feed-post all
-@router.get("", status_code=status.HTTP_200_OK)
+@router.get("/trending", status_code=status.HTTP_200_OK)
 async def post_master_all(request:Request,limit: Optional[int] = 10, offset: Optional[int] = 0):
     sql = " select * from tbl_post_master"
+    where = " where ageing <= 3"
     orderby = " order by count_like desc nulls last limit {limit} offset {offset}".format(limit=limit,offset=offset)
 
     sql = sql + orderby

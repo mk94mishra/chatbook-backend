@@ -7,6 +7,10 @@ class ChatCreate(BaseModel):
     receiver_id:int
     msg:str 
 
+class ChatRequestCreate(BaseModel):
+    sender_id:int
+    receiver_id:int
+    msg:str 
 
 class ChatUpdate(BaseModel):
     sender_id:int

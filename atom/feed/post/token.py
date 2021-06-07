@@ -144,6 +144,8 @@ async def post_master_trending(request:Request,payload: Feed):
     except OperationalError:
         return error_response(code=400, message="something error!")
 
+
+
 # get feed-post my-post
 @router.get("/my-post", status_code=status.HTTP_200_OK)
 async def post_master_my_post(request:Request,limit:Optional[int] = 10, offset:Optional[int] = 0):
@@ -171,8 +173,9 @@ async def post_master_my_post(request:Request,limit:Optional[int] = 10, offset:O
         return error_response(code=400, message="something error!")
 
 
+
 # get feed-post my bookmark
-@router.get("/my-bookmark", status_code=status.HTTP_200_OK)
+@router.get("/my-bookmarked-post", status_code=status.HTTP_200_OK)
 async def post_master_my_bookmark(request:Request,limit:Optional[int] = 10, offset:Optional[int] = 0):
     logged_in_user_id = request.state.user_id
     user = await User.get(id=logged_in_user_id)
@@ -199,7 +202,7 @@ async def post_master_my_bookmark(request:Request,limit:Optional[int] = 10, offs
 
 
 # get feed-post my like
-@router.get("/my_like", status_code=status.HTTP_200_OK)
+@router.get("/my-liked-post", status_code=status.HTTP_200_OK)
 async def post_master_my_like(request:Request,limit:Optional[int] = 10, offset:Optional[int] = 0):
     logged_in_user_id = request.state.user_id
     user = await User.get(id=logged_in_user_id)
@@ -225,8 +228,8 @@ async def post_master_my_like(request:Request,limit:Optional[int] = 10, offset:O
         return error_response(code=400, message="something error!")
 
 
-# get feed-post my-comment-post
-@router.get("/my-comment-post", status_code=status.HTTP_200_OK)
+# get feed-post my-commented-post
+@router.get("/my-commented-post", status_code=status.HTTP_200_OK)
 async def post_master_my_comment_post(request:Request,limit:Optional[int] = 10, offset:Optional[int] = 0):
     logged_in_user_id = request.state.user_id
     user = await User.get(id=logged_in_user_id)

@@ -85,7 +85,7 @@ async def user_otp_verify(request: Request, payload: UserOtpVerify):
 
 # password login
 @router.post("/login-phone-password", status_code=status.HTTP_200_OK)
-async def user_login_password(request: Request, payload: UserLoginPassword):
+async def login_phone_password(request: Request, payload: UserLoginPassword):
     data = deepcopy(payload.dict())
     data = {k: v for k, v in payload.dict().items() if v is not None}
 
